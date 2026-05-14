@@ -2,6 +2,8 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { FinesService } from './fines.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles } from '../auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
 
 @Controller('fines')
 export class FinesController {
@@ -19,4 +21,12 @@ export class FinesController {
       message: 'Protected route working',
     };
   }
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @Get('admin-only')
+  adminOnlyRoute() {
+  return {
+    message: 'Welcome Admin',
+  };
+}
 }
