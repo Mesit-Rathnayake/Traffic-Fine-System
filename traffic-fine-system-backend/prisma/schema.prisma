@@ -23,14 +23,16 @@ model Fine {
   status           String  @default("PENDING")
   officerId        Int
   district         String?
+  payment          Payment?
 }
 
 model Payment {
   id        Int      @id @default(autoincrement())
-  fineId    Int
+  fineId    Int     @unique
   amount    Float
   status    String
   createdAt DateTime @default(now())
+  fine      Fine    @relation(fields: [fineId], references: [id])
 }
 
 enum Role {
