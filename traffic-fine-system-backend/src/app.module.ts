@@ -9,9 +9,17 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { EmailModule } from './email/email.module';
 
-
 @Module({
-  imports: [PrismaModule, FinesModule, AuthModule, UsersModule, PaymentsModule, AdminModule, EmailModule, EmailModule],
+  imports: [
+    PrismaModule,
+    FinesModule,
+    AuthModule,
+    UsersModule,
+    PaymentsModule,
+    AdminModule,
+    EmailModule,
+    EmailModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

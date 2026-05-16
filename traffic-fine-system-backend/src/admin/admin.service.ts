@@ -45,13 +45,21 @@ export class AdminService {
       map[district] = (map[district] || 0) + payment.amount;
     });
 
-    return Object.keys(map).map((district) => ({ district, total: map[district] }));
+    return Object.keys(map).map((district) => ({
+      district,
+      total: map[district],
+    }));
   }
 
   // 🔥 Fine category breakdown
   async getCategoryBreakdown() {
-    const fines = await this.prisma.fine.findMany({ select: { id: true, category: true } });
-    const payments = await this.prisma.payment.findMany({ where: { status: 'SUCCESS' }, select: { fineId: true } });
+    const fines = await this.prisma.fine.findMany({
+      select: { id: true, category: true },
+    });
+    const payments = await this.prisma.payment.findMany({
+      where: { status: 'SUCCESS' },
+      select: { fineId: true },
+    });
 
     const paidFineIds = new Set(payments.map((p) => p.fineId));
     const map: Record<string, number> = {};
@@ -62,6 +70,9 @@ export class AdminService {
       if (paidFineIds.has(fine.id)) map[category]++;
     });
 
-    return Object.keys(map).map((category) => ({ category, count: map[category] }));
+    return Object.keys(map).map((category) => ({
+      category,
+      count: map[category],
+    }));
   }
 }

@@ -54,8 +54,9 @@ export class PaymentsService {
         fine.referenceNumber,
         payment.amount,
       );
-    } catch (e) {
-      console.error('Failed to send payment email:', e?.message ?? e);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error('Failed to send payment email:', msg);
     }
 
     // 🚀 Return response
@@ -85,12 +86,20 @@ export class PaymentsService {
       },
     });
 
-    await this.prisma.fine.update({ where: { id: fine.id }, data: { status: 'PAID' } });
+    await this.prisma.fine.update({
+      where: { id: fine.id },
+      data: { status: 'PAID' },
+    });
 
     try {
-      await this.emailService.sendPaymentSuccessEmail('officer@gmail.com', fine.referenceNumber, payment.amount);
-    } catch (e) {
-      console.error('Failed to send payment email:', e?.message ?? e);
+      await this.emailService.sendPaymentSuccessEmail(
+        'officer@gmail.com',
+        fine.referenceNumber,
+        payment.amount,
+      );
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error('Failed to send payment email:', msg);
     }
 
     return { message: 'Payment successful', payment };

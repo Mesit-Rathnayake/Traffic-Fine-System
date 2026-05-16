@@ -25,8 +25,8 @@ export class FinesController {
   @Roles('ADMIN')
   @Get('admin-only')
   adminOnlyRoute() {
-  return {
-    message: 'Welcome Admin',
-  };
-}
+    return {
+      message: 'Welcome Admin',
+    };
+  }
 }
