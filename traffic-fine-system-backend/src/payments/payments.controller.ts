@@ -7,9 +7,15 @@ export class PaymentsController {
 
   @Post('pay')
   pay(@Body() body: any) {
-    return this.paymentsService.payFine(
-      body.referenceNumber,
-      body.amount,
-    );
+    // Support either referenceNumber or fineId in the request body
+    if (body.referenceNumber) {
+      return this.paymentsService.payFine(body.referenceNumber, body.amount);
+    }
+
+    if (body.fineId) {
+      return this.paymentsService.payFineById(body.fineId, body.amount);
+    }
+
+    return this.paymentsService.payFine(body.referenceNumber, body.amount);
   }
 }

@@ -15,9 +15,15 @@ export class AuthService {
 
   const user = await this.usersService.findByUsername(username);
 
-  console.log('USER FROM DB:', user);
-
   if (!user) {
+    throw new UnauthorizedException('Invalid credentials');
+  }
+
+  // Avoid logging sensitive fields such as the hashed password
+  console.log('USER FROM DB:', { id: user.id, username: user.username, role: user.role });
+
+  // If no password is stored for the user, reject authentication
+  if (!user.password) {
     throw new UnauthorizedException('Invalid credentials');
   }
 

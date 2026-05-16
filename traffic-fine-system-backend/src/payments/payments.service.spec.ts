@@ -1,3 +1,5 @@
+/// <reference types="jest" />
+import { describe, it, expect, beforeEach } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaymentsService } from './payments.service';
 

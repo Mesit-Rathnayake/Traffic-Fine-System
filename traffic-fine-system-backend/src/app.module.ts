@@ -7,9 +7,11 @@ import { PaymentsModule } from './payments/payments.module';
 import { AdminModule } from './admin/admin.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { EmailModule } from './email/email.module';
+
 
 @Module({
-  imports: [PrismaModule, FinesModule, AuthModule, UsersModule, PaymentsModule, AdminModule],
+  imports: [PrismaModule, FinesModule, AuthModule, UsersModule, PaymentsModule, AdminModule, EmailModule, EmailModule],
   controllers: [AppController],
   providers: [AppService],
 })
