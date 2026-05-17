@@ -114,7 +114,18 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.primary,
-        title: const Text('Traffic Fine System'),
+        title: Row(children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
+            child: Icon(Icons.local_police, color: Theme.of(context).colorScheme.primary, size: 24),
+          ),
+          const SizedBox(width: 12),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Traffic Fine System', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white)),
+            Text('Pay fines quickly', style: TextStyle(fontSize: 12, color: Colors.white70)),
+          ])
+        ]),
         centerTitle: false,
         toolbarHeight: 72,
       ),
@@ -123,160 +134,157 @@ class _HomePageState extends State<HomePage> {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 920),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 8))],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 6),
-                  Text('Traffic Fine Payment', style: Theme.of(context).textTheme.headlineMedium),
-                  const SizedBox(height: 6),
-                  Text('Enter your fine details and payment information to complete the transaction', style: TextStyle(color: Colors.grey.shade700)),
-                  const SizedBox(height: 18),
+            child: Card(
+              elevation: 6,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                        child: Icon(Icons.receipt_long, color: Theme.of(context).colorScheme.primary),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('Traffic Fine Payment', style: Theme.of(context).textTheme.headlineSmall),
+                        Text('Enter your fine details and payment information', style: TextStyle(color: Colors.grey.shade700, fontSize: 13)),
+                      ])
+                    ]),
+                    const SizedBox(height: 18),
 
-                  Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Fine Details
-                        const SizedBox(height: 6),
-                        Text('Fine Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary)),
-                        const SizedBox(height: 12),
-                        _twoColumns(
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(children: [Icon(Icons.info_outline, color: Theme.of(context).colorScheme.primary), const SizedBox(width: 8), Text('Fine Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary))]),
+                          const SizedBox(height: 12),
+
+                          _twoColumns(
+                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               const Text('Fine Reference Number *'),
                               const SizedBox(height: 6),
                               TextFormField(
                                 controller: _fineRef,
-                                decoration: const InputDecoration(hintText: 'Enter reference number'),
+                                decoration: InputDecoration(
+                                  hintText: 'Enter reference number',
+                                  prefixIcon: const Icon(Icons.confirmation_number),
+                                  filled: true,
+                                  fillColor: Colors.grey.shade100,
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                                ),
                                 validator: (v) => (v == null || v.trim().isEmpty) ? 'Fine reference number is required' : null,
                               ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                            ]),
+                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               const Text('Fine Category *'),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<String>(
-                                initialValue: _category,
+                                value: _category,
                                 items: _categories.map((c) => DropdownMenuItem(value: c['value'], child: Text(c['label']!))).toList(),
                                 onChanged: (v) => setState(() => _category = v),
-                                decoration: const InputDecoration(),
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.category),
+                                  filled: true,
+                                  fillColor: Colors.grey.shade100,
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                                ),
                                 validator: (v) => (v == null || v.isEmpty) ? 'Please select a fine category' : null,
                               ),
-                            ],
+                            ]),
+                            width,
                           ),
-                          width,
-                        ),
 
-                        const SizedBox(height: 18),
-                        // Personal Info
-                        Text('Personal Information', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary)),
-                        const SizedBox(height: 12),
-                        _twoColumns(
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                          const SizedBox(height: 18),
+                          Row(children: [Icon(Icons.person, color: Theme.of(context).colorScheme.primary), const SizedBox(width: 8), Text('Personal Information', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary))]),
+                          const SizedBox(height: 12),
+                          _twoColumns(
+                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               const Text('Full Name *'),
                               const SizedBox(height: 6),
-                              TextFormField(controller: _fullName, decoration: const InputDecoration(hintText: 'Enter your full name'), validator: (v) => (v == null || v.trim().isEmpty) ? 'Full name is required' : null),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                              TextFormField(controller: _fullName, decoration: InputDecoration(hintText: 'Enter your full name', prefixIcon: const Icon(Icons.person_outline), filled: true, fillColor: Colors.grey.shade100, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none)), validator: (v) => (v == null || v.trim().isEmpty) ? 'Full name is required' : null),
+                            ]),
+                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               const Text('Email *'),
                               const SizedBox(height: 6),
-                              TextFormField(controller: _email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(hintText: 'Enter your email'), validator: (v) {
+                              TextFormField(controller: _email, keyboardType: TextInputType.emailAddress, decoration: InputDecoration(hintText: 'Enter your email', prefixIcon: const Icon(Icons.email), filled: true, fillColor: Colors.grey.shade100, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none)), validator: (v) {
                                 if (v == null || v.trim().isEmpty) return 'Email is required';
                                 if (!v.contains('@')) return 'Enter a valid email';
                                 return null;
                               }),
-                            ],
+                            ]),
+                            width,
                           ),
-                          width,
-                        ),
 
-                        const SizedBox(height: 12),
-                        _twoColumns(
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                          const SizedBox(height: 12),
+                          _twoColumns(
+                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               const Text('Phone Number *'),
                               const SizedBox(height: 6),
-                              TextFormField(controller: _phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(hintText: 'Enter your phone number'), validator: (v) => (v == null || v.trim().isEmpty) ? 'Phone number is required' : null),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                              TextFormField(controller: _phone, keyboardType: TextInputType.phone, decoration: InputDecoration(hintText: 'Enter your phone number', prefixIcon: const Icon(Icons.phone_android), filled: true, fillColor: Colors.grey.shade100, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none)), validator: (v) => (v == null || v.trim().isEmpty) ? 'Phone number is required' : null),
+                            ]),
+                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               const Text('License Number'),
                               const SizedBox(height: 6),
-                              TextFormField(controller: _license, decoration: const InputDecoration(hintText: 'Enter your license number')),
-                            ],
+                              TextFormField(controller: _license, decoration: InputDecoration(hintText: 'Enter your license number', prefixIcon: const Icon(Icons.badge), filled: true, fillColor: Colors.grey.shade100, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none))),
+                            ]),
+                            width,
                           ),
-                          width,
-                        ),
 
-                        const SizedBox(height: 18),
-                        // Payment Info
-                        Text('Payment Information', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary)),
-                        const SizedBox(height: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                          const SizedBox(height: 18),
+                          Row(children: [Icon(Icons.payment, color: Theme.of(context).colorScheme.primary), const SizedBox(width: 8), Text('Payment Information', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary))]),
+                          const SizedBox(height: 12),
+                          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             const Text('Fine Amount (LKR) *'),
                             const SizedBox(height: 6),
-                            TextFormField(controller: _amount, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(hintText: 'Enter amount to pay'), validator: (v) => (v == null || v.trim().isEmpty) ? 'Amount is required' : null),
-                          ],
-                        ),
+                            TextFormField(controller: _amount, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: InputDecoration(hintText: 'Enter amount to pay', prefixIcon: const Icon(Icons.attach_money), filled: true, fillColor: Colors.grey.shade100, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none)), validator: (v) => (v == null || v.trim().isEmpty) ? 'Amount is required' : null),
+                          ]),
 
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.05), borderRadius: BorderRadius.circular(10)),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.06), borderRadius: BorderRadius.circular(10)),
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               Text('🔒 Your payment information is secure and encrypted', style: TextStyle(color: Colors.grey.shade700)),
                               const SizedBox(height: 12),
                               const Text('Card Number *'),
                               const SizedBox(height: 6),
-                              TextFormField(controller: _card, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: '1234 5678 9012 3456'), onChanged: _onCardChanged, validator: (v) => (v == null || v.replaceAll(' ', '').length < 12) ? 'Card number is required' : null),
+                              TextFormField(controller: _card, keyboardType: TextInputType.number, decoration: InputDecoration(hintText: '1234 5678 9012 3456', prefixIcon: const Icon(Icons.credit_card), filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), onChanged: _onCardChanged, validator: (v) => (v == null || v.replaceAll(' ', '').length < 12) ? 'Card number is required' : null),
                               const SizedBox(height: 12),
                               _twoColumns(
-                                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text('Expiry Date *'), const SizedBox(height: 6), TextFormField(controller: _expiry, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'MM/YY'), onChanged: _onExpiryChanged, validator: (v) => (v == null || v.length < 4) ? 'Expiry is required' : null)]),
-                                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const Text('CVV *'), const SizedBox(height: 6), TextFormField(controller: _cvv, obscureText: true, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: '123'), validator: (v) => (v == null || v.length < 3) ? 'CVV is required' : null)]),
+                                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                  const Text('Expiry Date *'),
+                                  const SizedBox(height: 6),
+                                  TextFormField(controller: _expiry, keyboardType: TextInputType.number, decoration: InputDecoration(hintText: 'MM/YY', prefixIcon: const Icon(Icons.calendar_month), filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), onChanged: _onExpiryChanged, validator: (v) => (v == null || v.length < 4) ? 'Expiry is required' : null),
+                                ]),
+                                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                  const Text('CVV *'),
+                                  const SizedBox(height: 6),
+                                  TextFormField(controller: _cvv, obscureText: true, keyboardType: TextInputType.number, decoration: InputDecoration(hintText: '123', prefixIcon: const Icon(Icons.lock), filled: true, fillColor: Colors.white, border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))), validator: (v) => (v == null || v.length < 3) ? 'CVV is required' : null),
+                                ]),
                                 width,
                               ),
-                            ],
+                            ]),
                           ),
-                        ),
 
-                        const SizedBox(height: 18),
-                        Row(children: [
-                          Expanded(
-                            child: ElevatedButton(onPressed: _loading ? null : _submit, child: Text(_loading ? 'Processing...' : 'Pay Now')),
-                          ),
-                          const SizedBox(width: 12),
-                          OutlinedButton(onPressed: _clear, child: const Text('Clear'))
-                        ]),
+                          const SizedBox(height: 18),
+                          Row(children: [
+                            Expanded(child: ElevatedButton.icon(onPressed: _loading ? null : _submit, icon: _loading ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.payments), label: Text(_loading ? 'Processing...' : 'Pay Now'))),
+                            const SizedBox(width: 12),
+                            OutlinedButton.icon(onPressed: _clear, icon: const Icon(Icons.clear), label: const Text('Clear'))
+                          ]),
 
-                        const SizedBox(height: 12),
-                        Text('By clicking Pay Now, you agree to our terms and conditions. Your data is secured.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
-                      ],
+                          const SizedBox(height: 12),
+                          Text('By clicking Pay Now, you agree to our terms and conditions. Your data is secured.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
