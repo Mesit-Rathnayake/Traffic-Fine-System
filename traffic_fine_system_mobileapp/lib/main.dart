@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'screens/home_page.dart';
-import 'screens/menu_page.dart';
 
 const Color kOrange = Color(0xFFFF7A00);
 const Color kLightOrange = Color(0xFFFFB36B);
@@ -74,8 +73,7 @@ class MyApp extends StatelessWidget {
       home: const SplashScreen(),
       routes: {
         '/signup': (context) => const SignupPage(),
-        '/home': (context) => const MenuPage(),
-        '/payment-home': (context) => const HomePage(),
+        '/home': (context) => const HomePage(),
       },
     );
   }
