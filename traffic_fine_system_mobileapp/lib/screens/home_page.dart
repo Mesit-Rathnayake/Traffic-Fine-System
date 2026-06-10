@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'fine_details_page.dart';
 import 'personal_info_page.dart';
 import 'payment_page.dart';
+import 'history.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,8 +14,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final List<_MenuItem> _items = [
     _MenuItem(label: 'Pay Fine', icon: Icons.payments, onTap: null),
-    _MenuItem(label: 'My Fines', icon: Icons.receipt_long, onTap: null),
-    _MenuItem(label: 'History', icon: Icons.history, onTap: null),
+    _MenuItem(label: 'My Fines', icon: Icons.history, onTap: null),
+    _MenuItem(label: 'Fine details', icon: Icons.receipt_long, onTap: null),
     _MenuItem(label: 'Profile', icon: Icons.person, onTap: null),
   ];
 
@@ -29,7 +30,7 @@ class _HomePageState extends State<HomePage> {
       case 'My Fines':
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const FineDetailsPage()),
+          MaterialPageRoute(builder: (_) => const HistoryPage()),
         );
         return;
       case 'Profile':
@@ -37,6 +38,12 @@ class _HomePageState extends State<HomePage> {
           context,
           MaterialPageRoute(builder: (_) => const PersonalInfoPage()),
         );
+        return;
+      case 'Fine details':
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const FineDetailsPage()),
+      );
         return;
       default:
         ScaffoldMessenger.of(context).showSnackBar(
