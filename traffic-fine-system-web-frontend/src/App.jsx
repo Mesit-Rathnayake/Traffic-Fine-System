@@ -158,29 +158,32 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
     })
   }
 
+  if (authUser) {
+    return (
+      <section className="w-full card border border-secondary-medium border-opacity-20">
+        <div className="rounded-xl bg-green-50 border border-green-200 px-4 py-4 text-sm text-green-800 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <p className="font-semibold">Signed in as {authUser.username}</p>
+          <button
+            type="button"
+            onClick={onSignOut}
+            className="text-sm font-semibold text-green-900 underline underline-offset-2 w-fit"
+          >
+            Sign out
+          </button>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="w-full card border border-secondary-medium border-opacity-20">
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between mb-6">
+      <div className="flex flex-col gap-4 mb-6">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-orange">
             Access required
           </p>
           <h2 className="text-2xl font-bold text-secondary-dark mt-2">Sign in or create an account</h2>
         </div>
-
-        {authUser ? (
-          <div className="rounded-xl bg-green-50 border border-green-200 px-4 py-3 text-sm text-green-800">
-            <p className="font-semibold">Signed in as {authUser.name || authUser.username}</p>
-            <p className="mt-1">You can fill the form below now.</p>
-            <button
-              type="button"
-              onClick={onSignOut}
-              className="mt-3 text-sm font-semibold text-green-900 underline underline-offset-2"
-            >
-              Sign out
-            </button>
-          </div>
-        ) : null}
       </div>
 
       {message.text ? (
