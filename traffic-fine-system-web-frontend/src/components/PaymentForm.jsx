@@ -2,7 +2,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import './PaymentForm.css'
 
-export default function PaymentForm() {
+export default function PaymentForm({ isAuthenticated = false }) {
   const [formData, setFormData] = useState({
     fineReferenceNumber: '',
     fineCategory: '',
@@ -37,6 +37,10 @@ export default function PaymentForm() {
   }
 
   const validateForm = () => {
+    if (!isAuthenticated) {
+      setMessage({ type: 'error', text: 'Please sign in before filling the form.' })
+      return false
+    }
     if (!formData.fineReferenceNumber.trim()) {
       setMessage({ type: 'error', text: 'Fine reference number is required' })
       return false
@@ -102,7 +106,7 @@ export default function PaymentForm() {
   }
 
   return (
-    <div className="w-full max-w-2xl card">
+    <div className="w-full card">
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-secondary-dark mb-2">
           Traffic Fine Payment
@@ -111,6 +115,12 @@ export default function PaymentForm() {
           Enter your fine details and payment information to complete the transaction
         </p>
       </div>
+
+      {!isAuthenticated ? (
+        <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-amber-900">
+          Please sign in before filling the form.
+        </div>
+      ) : null}
 
       {message.text && (
         <div className={`mb-6 p-4 rounded-lg ${message.type === 'success' 
@@ -123,7 +133,10 @@ export default function PaymentForm() {
       <form onSubmit={handleSubmit} className="space-y-6">
         
         {/* Fine Details Section */}
-        <div className="border-b-2 border-neutral-bg pb-6">
+        <fieldset
+          disabled={!isAuthenticated}
+          className={`border-b-2 border-neutral-bg pb-6 ${!isAuthenticated ? 'opacity-60' : ''}`}
+        >
           <h2 className="text-xl font-semibold text-secondary-dark mb-4">
             Fine Details
           </h2>
@@ -164,10 +177,13 @@ export default function PaymentForm() {
               </select>
             </div>
           </div>
-        </div>
+        </fieldset>
 
         {/* Personal Information Section */}
-        <div className="border-b-2 border-neutral-bg pb-6">
+        <fieldset
+          disabled={!isAuthenticated}
+          className={`border-b-2 border-neutral-bg pb-6 ${!isAuthenticated ? 'opacity-60' : ''}`}
+        >
           <h2 className="text-xl font-semibold text-secondary-dark mb-4">
             Personal Information
           </h2>
@@ -232,10 +248,13 @@ export default function PaymentForm() {
               />
             </div>
           </div>
-        </div>
+        </fieldset>
 
         {/* Payment Information Section */}
-        <div className="border-b-2 border-neutral-bg pb-6">
+        <fieldset
+          disabled={!isAuthenticated}
+          className={`border-b-2 border-neutral-bg pb-6 ${!isAuthenticated ? 'opacity-60' : ''}`}
+        >
           <h2 className="text-xl font-semibold text-secondary-dark mb-4">
             Payment Information
           </h2>
@@ -332,7 +351,7 @@ export default function PaymentForm() {
               </div>
             </div>
           </div>
-        </div>
+        </fieldset>
 
         {/* Submit Button */}
         <div className="flex gap-4">
@@ -341,7 +360,7 @@ export default function PaymentForm() {
             disabled={loading}
             className="btn-primary flex-1"
           >
-            {loading ? 'Processing...' : 'Pay Now'}
+            {loading ? 'Processing...' : isAuthenticated ? 'Pay Now' : 'Sign in to Pay'}
           </button>
           <button
             type="reset"
