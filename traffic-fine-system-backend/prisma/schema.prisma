@@ -11,6 +11,7 @@ model User {
   id        Int     @id @default(autoincrement())
   name      String
   username  String  @unique
+  email     String @unique
   password  String
   role      Role
 }
@@ -38,4 +39,5 @@ model Payment {
 enum Role {
   ADMIN
   OFFICER
+  DRIVER
 }

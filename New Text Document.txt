@@ -1,1 +1,15 @@
 $2b$10$uZPItPhKM6ki8w9ZRkfQAOFt7y1Yz.bBWzQRmbU57tWR8QNeoYZyC
+
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiQWRtaW4iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Nzg3MjM4MTksImV4cCI6MTc3ODgxMDIxOX0.IQgXjf1DShyYLnW64RCCfFu6UerWWzSwtfMJuYKzdtk
+
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiQWRtaW4iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Nzg4MTEyNjQsImV4cCI6MTc3ODg5NzY2NH0.WK73HhhNTA86qciJIlrrM3AiQei3pF_5dVsFN041Ra0
+
+Traffic1234@#
+
+Traffic1234@#Fine
+
+postgresql://postgres:Traffic1234@#Fine@db.fwwfmqonwscfiwsuxqla.supabase.co:5432/postgres
+
+gkca adzp vvil denv
