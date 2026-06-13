@@ -42,3 +42,38 @@ export async function payFine(payload) {
   const response = await apiClient.post('/payments/pay', payload)
   return response.data
 }
+
+export async function getAdminTotalCollections() {
+  const response = await apiClient.get('/admin/total-collections')
+  return response.data
+}
+
+export async function getAdminDistrictCollections() {
+  const response = await apiClient.get('/admin/district-collections')
+  return response.data
+}
+
+export async function getAdminCategoryBreakdown() {
+  const response = await apiClient.get('/admin/category-breakdown')
+  return response.data
+}
+
+export async function checkAdminAccess() {
+  const response = await apiClient.get('/fines/admin-only')
+  return response.data
+}
+
+export async function getAdminUsers(limit = 20) {
+  const response = await apiClient.get('/admin/users', { params: { limit } })
+  return response.data
+}
+
+export async function getAdminFines(limit = 20) {
+  const response = await apiClient.get('/admin/fines', { params: { limit } })
+  return response.data
+}
+
+export async function getAdminPayments(limit = 20) {
+  const response = await apiClient.get('/admin/payments', { params: { limit } })
+  return response.data
+}
