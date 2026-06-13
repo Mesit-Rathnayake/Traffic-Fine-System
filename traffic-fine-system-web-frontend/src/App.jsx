@@ -1,20 +1,10 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import PaymentForm from './components/PaymentForm'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import { loginUser, registerUser } from './services/trafficFineApi'
 
 const AUTH_STORAGE_KEY = 'traffic-fine-auth-session'
-const REGISTERED_ACCOUNTS_KEY = 'traffic-fine-registered-accounts'
-
-function readStorageJson(key, fallback) {
-  try {
-    const value = window.localStorage.getItem(key)
-    return value ? JSON.parse(value) : fallback
-  } catch {
-    return fallback
-  }
-}
 
 function AuthPanel({ authUser, onAuthChange, onSignOut }) {
   const [mode, setMode] = useState('signin')
@@ -46,33 +36,14 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
     setMessage({ type: '', text: '' })
 
     try {
-      const registeredAccounts = readStorageJson(REGISTERED_ACCOUNTS_KEY, [])
-      const localAccount = registeredAccounts.find(
-        (account) => account.username === signinData.username,
-      )
-
-      if (localAccount && localAccount.password === signinData.password) {
-        persistAuth({
-          username: localAccount.username,
-          name: localAccount.name,
-          email: localAccount.email,
-          source: 'local',
-        })
-        setMessage({
-          type: 'success',
-          text: `Signed in as ${localAccount.username}.`,
-        })
-        return
-      }
-
-      const response = await axios.post('/api/auth/login', {
+      const response = await loginUser({
         username: signinData.username,
         password: signinData.password,
       })
 
       persistAuth({
         username: signinData.username,
-        token: response.data.access_token,
+        token: response.access_token,
         source: 'backend',
       })
       setMessage({
@@ -89,7 +60,7 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
     }
   }
 
-  const handleSignUp = (event) => {
+  const handleSignUp = async (event) => {
     event.preventDefault()
 
     if (
@@ -118,44 +89,51 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
       return
     }
 
-    const registeredAccounts = readStorageJson(REGISTERED_ACCOUNTS_KEY, [])
-    const duplicateAccount = registeredAccounts.find(
-      (account) => account.username === signupData.username,
-    )
-
-    if (duplicateAccount) {
-      setMessage({ type: 'error', text: 'That username is already registered.' })
-      return
-    }
-
-    const nextAccount = {
+    const payload = {
       name: signupData.name.trim(),
       username: signupData.username.trim(),
       email: signupData.email.trim(),
       password: signupData.password,
     }
 
-    const nextAccounts = [...registeredAccounts, nextAccount]
-    window.localStorage.setItem(REGISTERED_ACCOUNTS_KEY, JSON.stringify(nextAccounts))
-    persistAuth({
-      username: nextAccount.username,
-      name: nextAccount.name,
-      email: nextAccount.email,
-      source: 'local',
-    })
-    setMessage({
-      type: 'success',
-      text: 'Account created and signed in. You can now unlock the payment form.',
-    })
-    setMode('signin')
-    setSigninData({ username: nextAccount.username, password: '' })
-    setSignupData({
-      name: '',
-      username: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-    })
+    setLoading(true)
+    setMessage({ type: '', text: '' })
+
+    try {
+      await registerUser(payload)
+      const loginResponse = await loginUser({
+        username: payload.username,
+        password: payload.password,
+      })
+
+      persistAuth({
+        username: payload.username,
+        name: payload.name,
+        email: payload.email,
+        token: loginResponse.access_token,
+        source: 'backend',
+      })
+      setMessage({
+        type: 'success',
+        text: 'Account created and signed in successfully.',
+      })
+      setMode('signin')
+      setSigninData({ username: payload.username, password: '' })
+      setSignupData({
+        name: '',
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      })
+    } catch (error) {
+      setMessage({
+        type: 'error',
+        text: error.response?.data?.message || 'Sign up failed. Please try again.',
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (authUser) {

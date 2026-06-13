@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import axios from 'axios'
 import './PaymentForm.css'
+import { getFineByReference, payFine } from '../services/trafficFineApi'
 
 export default function PaymentForm({ isAuthenticated = false }) {
   const [formData, setFormData] = useState({
@@ -18,6 +18,8 @@ export default function PaymentForm({ isAuthenticated = false }) {
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ type: '', text: '' })
+  const [fineRecord, setFineRecord] = useState(null)
+  const [lookupLoading, setLookupLoading] = useState(false)
 
   const fineCategories = [
     { value: 'SPEEDING', label: 'Speeding' },
@@ -32,8 +34,57 @@ export default function PaymentForm({ isAuthenticated = false }) {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
+      ...(name === 'fineReferenceNumber'
+        ? { fineCategory: '', amount: '' }
+        : {}),
       [name]: value
     }))
+
+    if (name === 'fineReferenceNumber') {
+      setFineRecord(null)
+    }
+  }
+
+  const handleLoadFine = async () => {
+    if (!formData.fineReferenceNumber.trim()) {
+      setMessage({ type: 'error', text: 'Enter a fine reference number first.' })
+      return
+    }
+
+    setLookupLoading(true)
+    setMessage({ type: '', text: '' })
+
+    try {
+      const fine = await getFineByReference(formData.fineReferenceNumber.trim())
+
+      if (!fine) {
+        setFineRecord(null)
+        setMessage({ type: 'error', text: 'No fine found for that reference number.' })
+        return
+      }
+
+      setFineRecord(fine)
+      setFormData(prev => ({
+        ...prev,
+        fineCategory: fine.category || prev.fineCategory,
+        amount: String(fine.amount ?? prev.amount),
+      }))
+      setMessage({
+        type: fine.status === 'PAID' ? 'error' : 'success',
+        text:
+          fine.status === 'PAID'
+            ? 'This fine is already marked as paid.'
+            : 'Fine details loaded from the backend.',
+      })
+    } catch (error) {
+      setFineRecord(null)
+      setMessage({
+        type: 'error',
+        text: error.response?.data?.message || 'Unable to load the fine details.',
+      })
+    } finally {
+      setLookupLoading(false)
+    }
   }
 
   const validateForm = () => {
@@ -61,6 +112,10 @@ export default function PaymentForm({ isAuthenticated = false }) {
       setMessage({ type: 'error', text: 'Phone number is required' })
       return false
     }
+    if (!formData.amount.trim()) {
+      setMessage({ type: 'error', text: 'Fine amount is required' })
+      return false
+    }
     if (!formData.cardNumber.trim()) {
       setMessage({ type: 'error', text: 'Card number is required' })
       return false
@@ -79,7 +134,18 @@ export default function PaymentForm({ isAuthenticated = false }) {
     setMessage({ type: '', text: '' })
 
     try {
-      const response = await axios.post('/api/payment/process', formData)
+      const amount = Number.parseFloat(formData.amount)
+
+      if (Number.isNaN(amount) || amount <= 0) {
+        setMessage({ type: 'error', text: 'Enter a valid fine amount.' })
+        return
+      }
+
+      await payFine({
+        referenceNumber: formData.fineReferenceNumber.trim(),
+        fineId: fineRecord?.id,
+        amount,
+      })
       setMessage({ type: 'success', text: 'Payment processed successfully! Check your email for receipt.' })
       
       // Reset form
@@ -95,6 +161,7 @@ export default function PaymentForm({ isAuthenticated = false }) {
         expiryDate: '',
         cvv: ''
       })
+      setFineRecord(null)
     } catch (error) {
       setMessage({ 
         type: 'error', 
@@ -146,15 +213,30 @@ export default function PaymentForm({ isAuthenticated = false }) {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Fine Reference Number *
               </label>
-              <input
-                type="text"
-                name="fineReferenceNumber"
-                value={formData.fineReferenceNumber}
-                onChange={handleChange}
-                className="input-field"
-                placeholder="Enter reference number"
-                required
-              />
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <input
+                  type="text"
+                  name="fineReferenceNumber"
+                  value={formData.fineReferenceNumber}
+                  onChange={handleChange}
+                  className="input-field flex-1"
+                  placeholder="Enter reference number"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={handleLoadFine}
+                  disabled={lookupLoading}
+                  className="px-5 py-3 rounded-lg border-2 border-secondary-dark text-secondary-dark font-semibold hover:bg-secondary-dark hover:text-white transition-all duration-200 disabled:opacity-60"
+                >
+                  {lookupLoading ? 'Loading...' : 'Load fine details'}
+                </button>
+              </div>
+              {fineRecord ? (
+                <p className="mt-2 text-sm text-gray-600">
+                  Current status: <span className="font-semibold">{fineRecord.status}</span>
+                </p>
+              ) : null}
             </div>
 
             <div>
@@ -274,6 +356,7 @@ export default function PaymentForm({ isAuthenticated = false }) {
                 min="0"
                 step="0.01"
                 required
+                readOnly={Boolean(fineRecord)}
               />
             </div>
           </div>
