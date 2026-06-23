@@ -3,6 +3,7 @@ import 'fine_details_page.dart';
 import 'personal_info_page.dart';
 import 'payment_page.dart';
 import 'history.dart';
+import 'package:traffic_fine_system_mobileapp/services/api_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,6 +20,18 @@ class _HomePageState extends State<HomePage> {
   static const _slate     = Color(0xFFF0F4FA);
   static const _textDark  = Color(0xFF0D2B55);
   static const _textMid   = Color(0xFF6B7A99);
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour; // Gets the current hour (0-23)
+
+    if (hour < 12) {
+      return 'Good Morning';
+    } else if (hour < 17) {
+      return 'Good Afternoon';
+    } else {
+      return 'Good Evening';
+    }
+  }
 
   // ── menu items (logic unchanged) ────────────────────────────────────────
   final List<_MenuItem> _items = [
@@ -82,7 +95,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ── header widget ────────────────────────────────────────────────────────
-  Widget _buildHeader() {
+  Widget _buildHeader(String name) {
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -141,8 +154,8 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(height: 20),
               // greeting
-              const Text(
-                'Good morning,',
+              Text(
+                _getGreeting(),
                 style: TextStyle(
                   color: Colors.white60,
                   fontSize: 13,
@@ -150,8 +163,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 2),
-              const Text(
-                'John Perera',
+              Text(
+                name,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 22,
@@ -307,6 +320,7 @@ class _HomePageState extends State<HomePage> {
   // ── build ────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
+    String userName = ApiService.currentUser?['name'] ?? 'User';
     return Scaffold(
       backgroundColor: _slate,
       appBar: AppBar(
@@ -317,7 +331,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildHeader(),
+          _buildHeader(userName),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),

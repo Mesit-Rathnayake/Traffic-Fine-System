@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:traffic_fine_system_mobileapp/services/api_service.dart';
 
 class PersonalInfoPage extends StatefulWidget {
   const PersonalInfoPage({super.key});
@@ -9,6 +10,7 @@ class PersonalInfoPage extends StatefulWidget {
 
 class _PersonalInfoPageState extends State<PersonalInfoPage> {
   final _formKey = GlobalKey<FormState>();
+  bool _isEditing = false;
   final _fullName = TextEditingController();
   final _email = TextEditingController();
   final _phone = TextEditingController();
@@ -17,6 +19,48 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
   static const Color _primaryBlue = Color(0xFF123B73);
 
   @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final userData = await ApiService.fetchUserProfile();
+    if (userData != null) {
+      setState(() {
+        _fullName.text = userData['fullName'] ?? '';
+        _email.text = userData['email'] ?? '';
+        _phone.text = userData['phone'] ?? '';
+        _license.text = userData['license'] ?? '';
+      });
+    }
+  }
+
+  Future<void> _handlesave() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    final updatedData = {
+      'name': _fullName.text,
+      'email': _email.text,
+      'phone': _phone.text,
+      'license': _license.text,
+    };
+
+    // Send this to your backend
+    bool success = await ApiService.updateUserProfile(updatedData);
+
+    if (success) {
+      if (!mounted) return;
+      setState(() => _isEditing = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Personal information saved!'),
+          backgroundColor: _primaryBlue,
+        ),
+      );
+    }
+  }
+
   void dispose() {
     _fullName.dispose();
     _email.dispose();
@@ -25,29 +69,9 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
     super.dispose();
   }
 
-  void _save() {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Row(
-          children: [
-            Icon(Icons.check_circle_outline, color: Colors.white, size: 18),
-            SizedBox(width: 10),
-            Text('Personal information saved'),
-          ],
-        ),
-        backgroundColor: _primaryBlue,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       appBar: AppBar(
         backgroundColor: _primaryBlue,
         foregroundColor: Colors.white,
@@ -57,6 +81,15 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
           'Personal information',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => setState(() => _isEditing = !_isEditing),
+            child: Text(
+              _isEditing ? 'Cancel' : 'Edit',
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
         leading: const BackButton(),
       ),
       body: Form(
@@ -73,15 +106,22 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                     const _AvatarHeader(),
                     const SizedBox(height: 20),
 
+                    _InputField(
+                      controller: _fullName,
+                      hint: 'Full name',
+                      icon: Icons.badge_outlined,
+                      readOnly: !_isEditing, // Locks the field when not editing
+                    ),
+
                     // ── Form card ─────────────────────────────────────
                     Container(
                       decoration: BoxDecoration(
                         color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: Theme.of(context)
-                              .dividerColor
-                              .withOpacity(0.3),
+                          color: Theme.of(
+                            context,
+                          ).dividerColor.withOpacity(0.3),
                           width: 0.5,
                         ),
                       ),
@@ -94,20 +134,20 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                             controller: _fullName,
                             hint: 'As on your NIC',
                             icon: Icons.badge_outlined,
+                            readOnly: !_isEditing,
                             keyboardType: TextInputType.name,
                             textCapitalization: TextCapitalization.words,
-                            validator: (v) =>
-                                (v == null || v.trim().isEmpty)
-                                    ? 'Full name is required'
-                                    : null,
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Full name is required'
+                                : null,
                           ),
                           const _FieldDivider(),
-
                           _FieldLabel(text: 'Email address', required: true),
                           _InputField(
                             controller: _email,
                             hint: 'Receipt will be sent here',
                             icon: Icons.mail_outline_rounded,
+                            readOnly: !_isEditing,
                             keyboardType: TextInputType.emailAddress,
                             validator: (v) {
                               if (v == null || v.trim().isEmpty) {
@@ -126,11 +166,11 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                             controller: _phone,
                             hint: '07X XXX XXXX',
                             icon: Icons.phone_outlined,
+                            readOnly: !_isEditing,
                             keyboardType: TextInputType.phone,
-                            validator: (v) =>
-                                (v == null || v.trim().isEmpty)
-                                    ? 'Phone number is required'
-                                    : null,
+                            validator: (v) => (v == null || v.trim().isEmpty)
+                                ? 'Phone number is required'
+                                : null,
                           ),
                           const _FieldDivider(),
 
@@ -139,6 +179,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                             controller: _license,
                             hint: 'Optional',
                             icon: Icons.drive_file_rename_outline_rounded,
+                            readOnly: !_isEditing,
                             isOptional: true,
                           ),
                         ],
@@ -154,7 +195,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
             ),
 
             // ── Save button ─────────────────────────────────────────
-            _SaveButton(onPressed: _save),
+            if (_isEditing) _SaveButton(onPressed: _handlesave),
           ],
         ),
       ),
@@ -237,18 +278,17 @@ class _FieldLabel extends StatelessWidget {
                 alignment: PlaceholderAlignment.middle,
                 child: Container(
                   margin: const EdgeInsets.only(left: 6),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.07),
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.07),
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(
-                      color: Theme.of(context)
-                          .dividerColor
-                          .withOpacity(0.3),
+                      color: Theme.of(context).dividerColor.withOpacity(0.3),
                       width: 0.5,
                     ),
                   ),
@@ -256,10 +296,9 @@ class _FieldLabel extends StatelessWidget {
                     'Optional',
                     style: TextStyle(
                       fontSize: 10,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.4),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.4),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -282,6 +321,7 @@ class _InputField extends StatelessWidget {
   final TextInputType keyboardType;
   final TextCapitalization textCapitalization;
   final String? Function(String?)? validator;
+  final bool readOnly;
   final bool isOptional;
 
   const _InputField({
@@ -291,6 +331,7 @@ class _InputField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.textCapitalization = TextCapitalization.none,
     this.validator,
+    this.readOnly = false,
     this.isOptional = false,
   });
 
@@ -302,6 +343,7 @@ class _InputField extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 4),
       child: TextFormField(
         controller: controller,
+        readOnly: readOnly,
         keyboardType: keyboardType,
         textCapitalization: textCapitalization,
         validator: validator,
@@ -320,11 +362,11 @@ class _InputField extends StatelessWidget {
           filled: true,
           fillColor: isOptional
               ? Theme.of(context).colorScheme.onSurface.withOpacity(0.03)
-              : (isDark
-                  ? Theme.of(context).colorScheme.surface
-                  : Colors.white),
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+              : (isDark ? Theme.of(context).colorScheme.surface : Colors.white),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 14,
+            horizontal: 14,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
             borderSide: BorderSide(
@@ -344,29 +386,17 @@ class _InputField extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-              color: Color(0xFF185FA5),
-              width: 1.5,
-            ),
+            borderSide: const BorderSide(color: Color(0xFF185FA5), width: 1.5),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-              color: Color(0xFFA32D2D),
-              width: 1,
-            ),
+            borderSide: const BorderSide(color: Color(0xFFA32D2D), width: 1),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-              color: Color(0xFFA32D2D),
-              width: 1.5,
-            ),
+            borderSide: const BorderSide(color: Color(0xFFA32D2D), width: 1.5),
           ),
-          errorStyle: const TextStyle(
-            fontSize: 11,
-            color: Color(0xFFA32D2D),
-          ),
+          errorStyle: const TextStyle(fontSize: 11, color: Color(0xFFA32D2D)),
         ),
       ),
     );

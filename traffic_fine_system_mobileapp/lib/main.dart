@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'screens/home_page.dart';
+import 'services/api_service.dart';
 
 const Color kOrange = Color(0xFFFF7A00);
 const Color kLightOrange = Color(0xFFFFB36B);
@@ -74,6 +75,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/signup': (context) => const SignupPage(),
         '/home': (context) => const HomePage(),
+        '/login': (context) => const LoginPage(),
       },
     );
   }
@@ -484,6 +486,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _obscure = true;
 
+  
   @override
   void dispose() {
     _emailController.dispose();
@@ -491,8 +494,42 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  // Place this inside _LoginPageState
+  Future<void> _loginUser() async {
+    try {
+      // 1. Send the email and password to your NestJS backend
+      final response = await ApiService.dio.post(
+        '/auth/login', // Use your specific login endpoint
+        data: {
+          "email": _emailController.text.trim(),
+          "password": _passwordController.text.trim(),
+        },
+      );
+
+      // 2. Check if the login was successful
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // If your backend returns a token, you might want to save it:
+        // final token = response.data['access_token'];
+        // await storage.write(key: 'token', value: token);
+        ApiService.currentUser = response.data['user'];
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
+      }
+    } catch (e) {
+      // 3. Handle errors (e.g., wrong password)
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invalid email or password')),
+        );
+      }
+      print("Login Error: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: kBg,
       body: Center(
@@ -627,16 +664,10 @@ class _LoginPageState extends State<LoginPage> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState?.validate() ?? false) {
-                        Navigator.pushReplacementNamed(context, '/home');
+                        _loginUser(); // Call the new function
                       }
                     },
-                    child: const Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: const Text('Login'),
                   ),
                   const SizedBox(height: 18),
                   Row(
@@ -736,6 +767,30 @@ class _SignupPageState extends State<SignupPage> {
     _confirmController.dispose();
     super.dispose();
   }
+
+  Future<void> _registerUser() async {
+  try {
+    // This sends the data to your NestJS backend
+    final response = await ApiService.dio.post(
+      '/auth/register',
+      data: {
+        "name": _nameController.text,
+        "username": _emailController.text, // Using email as username if needed
+        "email": _emailController.text,
+        "password": _passwordController.text,
+        "role": "OFFICER", // Make sure to include the role your backend expects
+      },
+    );
+    
+    // If successful, navigate to home
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, '/login');
+    }
+  } catch (e) {
+    // If it fails, show an error (you could use a SnackBar here)
+    print("Registration Error: $e");
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -899,7 +954,7 @@ class _SignupPageState extends State<SignupPage> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState?.validate() ?? false) {
-                        Navigator.pushReplacementNamed(context, '/home');
+                       _registerUser();
                       }
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: kDarkTeal),
@@ -945,16 +1000,6 @@ class _SignupPageState extends State<SignupPage> {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -966,50 +1011,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+            _counter++;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text('You have pushed the button this many times:'),

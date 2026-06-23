@@ -14,13 +14,18 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(username: string, password: string) {
-    const user = await this.usersService.findByUsername(username);
+  // Update the parameter name to be more clear
+  async login(loginDto: { email: string; password: string }) { 
+    const { email, password } = loginDto;
+
+    if(!email || !password) {
+      throw new BadRequestException('Email and password are required');
+    }
+    const user = await this.usersService.findByEmail(email);
 
     if (!user || !user.password) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
@@ -29,12 +34,16 @@ export class AuthService {
 
     const payload = {
       sub: user.id,
-      username: user.username,
+      email: user.email, // Use email here instead of username
       role: user.role,
     };
 
     return {
       access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        name: user.name,  
+      },
     };
   }
 

@@ -1,0 +1,301 @@
+@page {
+  size: A4;
+  margin: 22mm 20mm 24mm 20mm;
+}
+
+@page :first {
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 11pt;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Calibri, Arial, sans-serif;
+  color: #1a1a1a;
+  line-height: 1.55;
+  background: #fff;
+}
+
+.cover-page {
+  page-break-after: always;
+  min-height: 297mm;
+  padding: 28mm 24mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(160deg, #0b4f6c 0%, #132a40 45%, #07111f 100%);
+  color: #fff;
+}
+
+.cover-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  font-size: 10pt;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cover-title-block h1 {
+  margin: 18px 0 8px;
+  font-size: 30pt;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.cover-title-block h2 {
+  margin: 0;
+  font-size: 16pt;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.cover-meta {
+  margin-top: 36px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cover-meta td {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 11pt;
+}
+
+.cover-meta td:first-child {
+  width: 38%;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.cover-footer {
+  font-size: 10pt;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.document-body {
+  padding: 0;
+}
+
+.doc-header-bar {
+  border-bottom: 3px solid #0b4f6c;
+  padding-bottom: 10px;
+  margin-bottom: 24px;
+}
+
+.doc-header-bar .kicker {
+  color: #0b4f6c;
+  font-size: 10pt;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.doc-header-bar .title {
+  margin: 4px 0 0;
+  font-size: 18pt;
+  color: #111;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: #0b4f6c;
+  page-break-after: avoid;
+}
+
+h1 {
+  font-size: 20pt;
+  margin-top: 28px;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ff7a00;
+  padding-bottom: 6px;
+}
+
+h2 {
+  font-size: 15pt;
+  margin-top: 24px;
+  margin-bottom: 8px;
+}
+
+h3 {
+  font-size: 12.5pt;
+  margin-top: 18px;
+  margin-bottom: 6px;
+  color: #1b85b8;
+}
+
+h4 {
+  font-size: 11.5pt;
+  margin-top: 14px;
+}
+
+p {
+  margin: 0 0 10px;
+  text-align: justify;
+}
+
+ul,
+ol {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+li {
+  margin-bottom: 4px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 18px;
+  font-size: 10pt;
+  page-break-inside: avoid;
+}
+
+thead th {
+  background: #0b4f6c;
+  color: #fff;
+  font-weight: 600;
+  text-align: left;
+  padding: 8px 10px;
+}
+
+tbody td,
+tbody th {
+  border: 1px solid #d9dee3;
+  padding: 7px 10px;
+  vertical-align: top;
+}
+
+tbody tr:nth-child(even) {
+  background: #f7f9fb;
+}
+
+blockquote {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-left: 4px solid #ff7a00;
+  background: #fff8f2;
+  color: #333;
+}
+
+pre {
+  background: #f4f6f8;
+  border: 1px solid #d9dee3;
+  border-radius: 6px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  font-size: 9pt;
+  line-height: 1.45;
+  page-break-inside: avoid;
+}
+
+code {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 9.5pt;
+}
+
+:not(pre) > code {
+  background: #eef2f5;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #d9dee3;
+  margin: 22px 0;
+}
+
+.diagram-block {
+  margin: 16px 0 20px;
+  padding: 12px;
+  border: 1px solid #d9dee3;
+  border-radius: 8px;
+  background: #fcfdfe;
+  page-break-inside: avoid;
+}
+
+.diagram-caption {
+  margin: 0 0 10px;
+  font-size: 10pt;
+  font-weight: 600;
+  color: #0b4f6c;
+}
+
+.mermaid {
+  text-align: center;
+  overflow-x: auto;
+}
+
+.toc {
+  page-break-after: always;
+}
+
+.toc h1 {
+  margin-top: 0;
+}
+
+.toc ol {
+  list-style: none;
+  padding-left: 0;
+}
+
+.toc li {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dotted #ccc;
+  padding: 6px 0;
+  font-size: 11pt;
+}
+
+.toc a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-footer-note {
+  margin-top: 30px;
+  padding-top: 10px;
+  border-top: 1px solid #d9dee3;
+  font-size: 9pt;
+  color: #666;
+  text-align: center;
+}
+
+@media print {
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .cover-page {
+    break-after: page;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  table,
+  pre,
+  .diagram-block {
+    break-inside: avoid;
+  }
+}
