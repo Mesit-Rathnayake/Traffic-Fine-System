@@ -10,11 +10,17 @@ import { EmailService } from '../email/email.service';
 @Injectable()
 export class PaymentsService {
   constructor(
-    private prisma: PrismaService,
-    private emailService: EmailService,
+    private readonly prisma: PrismaService,
+    private readonly emailService: EmailService,
   ) {}
 
   async payFine(referenceNumber: string, amount: number) {
+    const safeAmount = Number(amount);
+
+    if (Number.isNaN(safeAmount) || safeAmount <= 0) {
+      throw new BadRequestException('Amount must be a positive number');
+    }
+
     // 🔍 Find fine
     const fine = await this.prisma.fine.findUnique({
       where: { referenceNumber },
@@ -34,7 +40,7 @@ export class PaymentsService {
     const payment = await this.prisma.payment.create({
       data: {
         fineId: fine.id,
-        amount,
+        amount: safeAmount,
         status: 'SUCCESS',
       },
     });
@@ -68,6 +74,12 @@ export class PaymentsService {
 
   // Support paying by internal fine id as well
   async payFineById(fineId: number, amount: number) {
+    const safeAmount = Number(amount);
+
+    if (Number.isNaN(safeAmount) || safeAmount <= 0) {
+      throw new BadRequestException('Amount must be a positive number');
+    }
+
     const fine = await this.prisma.fine.findUnique({ where: { id: fineId } });
 
     if (!fine) {
@@ -81,7 +93,7 @@ export class PaymentsService {
     const payment = await this.prisma.payment.create({
       data: {
         fineId: fine.id,
-        amount,
+        amount: safeAmount,
         status: 'SUCCESS',
       },
     });

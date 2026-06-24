@@ -5,6 +5,12 @@ import { PrismaService } from '../prisma/prisma.service';
 export class FinesService {
   constructor(private prisma: PrismaService) {}
 
+  async listFines() {
+    return this.prisma.fine.findMany({
+      orderBy: { id: 'desc' },
+    });
+  }
+
   async getFineByReference(referenceNumber: string) {
     return this.prisma.fine.findUnique({
       where: { referenceNumber },

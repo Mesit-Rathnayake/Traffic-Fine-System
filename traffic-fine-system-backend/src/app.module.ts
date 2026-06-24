@@ -18,7 +18,6 @@ import { EmailModule } from './email/email.module';
     PaymentsModule,
     AdminModule,
     EmailModule,
-    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

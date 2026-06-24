@@ -10,22 +10,28 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  // Update the parameter name to be more clear
-  async login(loginDto: { email: string; password: string }) { 
-    const { email, password } = loginDto;
+  async login(loginDto: { email?: string; username?: string; password: string }) {
+    const { email, username, password } = loginDto;
 
-    if(!email || !password) {
-      throw new BadRequestException('Email and password are required');
+    if (!password || (!email && !username)) {
+      throw new BadRequestException('Email or username and password are required');
     }
-    const user = await this.usersService.findByEmail(email);
 
-    if (!user || !user.password) {
+    const normalizedEmail = email?.trim().toLowerCase();
+    const normalizedUsername = username?.trim();
+
+    const user = normalizedEmail
+      ? await this.usersService.findByEmail(normalizedEmail)
+      : await this.usersService.findByUsername(normalizedUsername!);
+
+    if (!user?.password) {
       throw new UnauthorizedException('Invalid credentials');
     }
+
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
@@ -34,7 +40,8 @@ export class AuthService {
 
     const payload = {
       sub: user.id,
-      email: user.email, // Use email here instead of username
+      email: user.email,
+      username: user.username,
       role: user.role,
     };
 
@@ -42,7 +49,10 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
       user: {
         id: user.id,
-        name: user.name,  
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        role: user.role,
       },
     };
   }

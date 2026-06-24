@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:traffic_fine_system_mobileapp/services/api_service.dart';
 
 class PaymentPage extends StatefulWidget {
   const PaymentPage({super.key});
@@ -98,19 +99,35 @@ class _PaymentPageState extends State<PaymentPage> {
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() => _loading = true);
-    await Future.delayed(const Duration(milliseconds: 700));
-    if (!mounted) return;
-    setState(() => _loading = false);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Payment processed successfully (mock). Receipt sent to email.',
-        ),
-      ),
-    );
+    try {
+      final amount = double.tryParse(_amount.text.trim()) ?? 0;
+      final success = await ApiService.payFine({
+        'referenceNumber': _fineRef.text.trim(),
+        'amount': amount,
+      });
 
-    _clear();
+      if (!mounted) return;
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Payment processed successfully.')),
+        );
+        _clear();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Payment failed. Check the reference number and try again.')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to connect to the payment service.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
   }
 
   InputDecoration _inputDec({

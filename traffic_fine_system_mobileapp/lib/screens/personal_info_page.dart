@@ -28,7 +28,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
     final userData = await ApiService.fetchUserProfile();
     if (userData != null) {
       setState(() {
-        _fullName.text = userData['fullName'] ?? '';
+        _fullName.text = userData['name'] ?? userData['fullName'] ?? '';
         _email.text = userData['email'] ?? '';
         _phone.text = userData['phone'] ?? '';
         _license.text = userData['license'] ?? '';

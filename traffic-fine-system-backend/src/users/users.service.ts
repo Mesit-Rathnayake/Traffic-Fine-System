@@ -31,14 +31,16 @@ export class UsersService {
   }
 
   async updateUser(id: number, data: any) {
+    const updatePayload: Record<string, string> = {};
+
+    if (typeof data?.name === 'string') updatePayload.name = data.name;
+    if (typeof data?.email === 'string') updatePayload.email = data.email;
+    if (typeof data?.phone === 'string') updatePayload.phone = data.phone;
+    if (typeof data?.license === 'string') updatePayload.license = data.license;
+
     return this.prisma.user.update({
       where: { id },
-      data: {
-        name : data.name,
-        email : data.email,
-        phone: data.phone,
-        license : data.license,
-      },
+      data: updatePayload,
     });
-}
+  }
 }

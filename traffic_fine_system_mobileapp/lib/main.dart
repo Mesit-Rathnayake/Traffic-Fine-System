@@ -497,33 +497,27 @@ class _LoginPageState extends State<LoginPage> {
   // Place this inside _LoginPageState
   Future<void> _loginUser() async {
     try {
-      // 1. Send the email and password to your NestJS backend
-      final response = await ApiService.dio.post(
-        '/auth/login', // Use your specific login endpoint
-        data: {
-          "email": _emailController.text.trim(),
-          "password": _passwordController.text.trim(),
-        },
+      final success = await ApiService.login(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
       );
 
-      // 2. Check if the login was successful
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        // If your backend returns a token, you might want to save it:
-        // final token = response.data['access_token'];
-        // await storage.write(key: 'token', value: token);
-        ApiService.currentUser = response.data['user'];
+      if (success) {
         if (mounted) {
           Navigator.pushReplacementNamed(context, '/home');
         }
-      }
-    } catch (e) {
-      // 3. Handle errors (e.g., wrong password)
-      if (mounted) {
+      } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Invalid email or password')),
         );
       }
-      print("Login Error: $e");
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unable to connect to the server')),
+        );
+      }
+      print('Login Error: $e');
     }
   }
 
@@ -769,28 +763,29 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Future<void> _registerUser() async {
-  try {
-    // This sends the data to your NestJS backend
-    final response = await ApiService.dio.post(
-      '/auth/register',
-      data: {
-        "name": _nameController.text,
-        "username": _emailController.text, // Using email as username if needed
-        "email": _emailController.text,
-        "password": _passwordController.text,
-        "role": "OFFICER", // Make sure to include the role your backend expects
-      },
-    );
-    
-    // If successful, navigate to home
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, '/login');
+    try {
+      await ApiService.dio.post(
+        '/auth/register',
+        data: {
+          'name': _nameController.text.trim(),
+          'username': _emailController.text.trim(),
+          'email': _emailController.text.trim(),
+          'password': _passwordController.text.trim(),
+        },
+      );
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration failed. Please try again.')),
+        );
+      }
+      print('Registration Error: $e');
     }
-  } catch (e) {
-    // If it fails, show an error (you could use a SnackBar here)
-    print("Registration Error: $e");
   }
-}
 
   @override
   Widget build(BuildContext context) {

@@ -1,13 +1,18 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { FinesService } from './fines.service';
-import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 
 @Controller('fines')
 export class FinesController {
-  constructor(private finesService: FinesService) {}
+  constructor(private readonly finesService: FinesService) {}
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  listFines() {
+    return this.finesService.listFines();
+  }
 
   @Get(':referenceNumber')
   getFine(@Param('referenceNumber') ref: string) {
