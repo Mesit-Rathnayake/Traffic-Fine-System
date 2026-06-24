@@ -75,4 +75,61 @@ export class AdminService {
       count: map[category],
     }));
   }
+
+  async getUsersList(limit = 20) {
+    const safeLimit = Number.isFinite(limit) ? Math.min(Math.max(limit, 1), 100) : 20;
+
+    return this.prisma.user.findMany({
+      orderBy: { id: 'desc' },
+      take: safeLimit,
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+        role: true,
+      },
+    });
+  }
+
+  async getFinesList(limit = 20) {
+    const safeLimit = Number.isFinite(limit) ? Math.min(Math.max(limit, 1), 100) : 20;
+
+    return this.prisma.fine.findMany({
+      orderBy: { id: 'desc' },
+      take: safeLimit,
+      select: {
+        id: true,
+        referenceNumber: true,
+        category: true,
+        amount: true,
+        status: true,
+        district: true,
+        officerId: true,
+      },
+    });
+  }
+
+  async getPaymentsList(limit = 20) {
+    const safeLimit = Number.isFinite(limit) ? Math.min(Math.max(limit, 1), 100) : 20;
+
+    return this.prisma.payment.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: safeLimit,
+      select: {
+        id: true,
+        fineId: true,
+        amount: true,
+        status: true,
+        createdAt: true,
+        fine: {
+          select: {
+            referenceNumber: true,
+            category: true,
+            district: true,
+          },
+        },
+      },
+    });
+  }
 }
