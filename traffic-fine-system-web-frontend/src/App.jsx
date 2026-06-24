@@ -567,7 +567,7 @@ function App() {
                 onSignOut={handleSignOut}
               />
 
-              {!isAdmin && activePortal !== 'admin' ? (
+              {/* {!isAdmin && activePortal !== 'admin' ? (
                 <section className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-orange">
                     Admin access
@@ -580,7 +580,7 @@ function App() {
                     separate sign-in panel and only opens for ADMIN accounts.
                   </p>
                 </section>
-              ) : null}
+              ) : null} */}
 
               {activePortal === 'payment' ? <PaymentForm isAuthenticated={Boolean(authUser)} /> : null}
             </div>
