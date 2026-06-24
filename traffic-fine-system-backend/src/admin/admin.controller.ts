@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -24,5 +24,20 @@ export class AdminController {
   @Get('category-breakdown')
   getCategoryBreakdown() {
     return this.adminService.getCategoryBreakdown();
+  }
+
+  @Get('users')
+  getUsersList(@Query('limit') limit?: string) {
+    return this.adminService.getUsersList(Number.parseInt(limit || '20', 10));
+  }
+
+  @Get('fines')
+  getFinesList(@Query('limit') limit?: string) {
+    return this.adminService.getFinesList(Number.parseInt(limit || '20', 10));
+  }
+
+  @Get('payments')
+  getPaymentsList(@Query('limit') limit?: string) {
+    return this.adminService.getPaymentsList(Number.parseInt(limit || '20', 10));
   }
 }
