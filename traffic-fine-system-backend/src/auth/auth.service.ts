@@ -76,11 +76,11 @@ export class AuthService {
       username: body.username,
       email: body.email,
       password: hashedPassword,
-      role: 'DRIVER',
+      role: body.role === 'OFFICER' ? 'OFFICER' : 'DRIVER',
     });
 
     return {
-      message: 'Driver registered successfully',
+      message: `${user.role === 'OFFICER' ? 'Officer' : 'Driver'} registered successfully`,
       user: {
         id: user.id,
         name: user.name,

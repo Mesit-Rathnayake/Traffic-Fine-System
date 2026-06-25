@@ -38,6 +38,11 @@ export async function getFineByReference(referenceNumber) {
   return response.data
 }
 
+export async function createFine(payload) {
+  const response = await apiClient.post('/fines', payload)
+  return response.data
+}
+
 export async function payFine(payload) {
   const response = await apiClient.post('/payments/pay', payload)
   return response.data

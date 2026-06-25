@@ -3,6 +3,7 @@ import PaymentForm from './components/PaymentForm'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import AdminDashboard from './components/AdminDashboard'
+import OfficerFineForm from './components/OfficerFineForm'
 import { loginUser, registerUser } from './services/trafficFineApi'
 
 const AUTH_STORAGE_KEY = 'traffic-fine-auth-session'
@@ -46,6 +47,7 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
     email: '',
     password: '',
     confirmPassword: '',
+    role: 'DRIVER',
   })
 
   useEffect(() => {
@@ -59,6 +61,7 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
         email: '',
         password: '',
         confirmPassword: '',
+        role: 'DRIVER',
       })
     }
   }, [authUser])
@@ -140,10 +143,8 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
       username: signupData.username.trim(),
       email: signupData.email.trim(),
       password: signupData.password,
+      role: signupData.role === 'OFFICER' ? 'OFFICER' : 'DRIVER',
     }
-
-    setLoading(true)
-    setMessage({ type: '', text: '' })
 
     try {
       await registerUser(payload)
@@ -162,7 +163,7 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
       })
       setMessage({
         type: 'success',
-        text: 'Account created and signed in successfully.',
+        text: `Account created and signed in successfully as ${payload.role === 'OFFICER' ? 'officer' : 'driver'}.`,
       })
       setMode('signin')
       setSigninData({ username: payload.username, password: '' })
@@ -172,6 +173,7 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
         email: '',
         password: '',
         confirmPassword: '',
+        role: 'DRIVER',
       })
     } catch (error) {
       setMessage({
@@ -211,7 +213,7 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
       <div className="flex flex-col gap-4 mb-6">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-orange">
-            Driver access
+            Driver / Officer access
           </p>
           <h2 className="text-2xl font-bold text-secondary-dark mt-2">
             Sign in or create an account
@@ -317,6 +319,22 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
               placeholder="Choose a username"
               autoComplete="username"
             />
+          </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Account type</label>
+            <select
+              value={signupData.role}
+              onChange={event =>
+                setSignupData(current => ({ ...current, role: event.target.value }))
+              }
+              className="input-field"
+            >
+              <option value="DRIVER">Driver account</option>
+              <option value="OFFICER">Officer account</option>
+            </select>
+            <p className="mt-2 text-xs text-slate-500">
+              Select Officer only if you are a police officer. Driver accounts are used for fine payment.
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
@@ -519,6 +537,10 @@ function App() {
         setAuthUser(parsedAuth)
         if (parsedAuth?.role === 'ADMIN') {
           setActivePortal('admin')
+        } else if (parsedAuth?.role === 'OFFICER') {
+          setActivePortal('officer')
+        } else {
+          setActivePortal('payment')
         }
       }
     } catch {
@@ -527,12 +549,18 @@ function App() {
   }, [])
 
   const isAdmin = authUser?.role === 'ADMIN'
+  const isOfficer = authUser?.role === 'OFFICER'
   const canAccessAdmin = !authUser || isAdmin
+  const roleLabel = authUser?.role === 'OFFICER' ? 'Officer' : authUser?.role === 'ADMIN' ? 'Admin' : authUser?.role || 'Guest'
 
   const handleAuthChange = nextUser => {
     setAuthUser(nextUser)
     if (nextUser?.role === 'ADMIN') {
       setActivePortal('admin')
+    } else if (nextUser?.role === 'OFFICER') {
+      setActivePortal('officer')
+    } else {
+      setActivePortal('payment')
     }
   }
 
@@ -559,13 +587,25 @@ function App() {
             <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-3xl space-y-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary-orange">
-                  Unified traffic fine portal
+                  {activePortal === 'admin'
+                    ? 'Unified admin portal'
+                    : activePortal === 'officer'
+                    ? 'Officer fine entry'
+                    : 'Unified traffic fine portal'}
                 </p>
                 <h2 className="text-3xl font-bold leading-tight text-slate-900 md:text-5xl">
-                  Driver payments first.
+                  {activePortal === 'admin'
+                    ? 'Monitor the system as an admin.'
+                    : activePortal === 'officer'
+                    ? 'Create fines quickly.'
+                    : 'Driver payments first.'}
                 </h2>
                 <p className="max-w-2xl text-sm leading-6 text-slate-600 md:text-base">
-                  Use the public sign-in and sign-up flow for drivers.
+                  {activePortal === 'admin'
+                    ? 'Review revenue, users, and fine data with admin access.'
+                    : activePortal === 'officer'
+                    ? 'Police officers can enter new fine details here.'
+                    : 'Use the public sign-in and sign-up flow for drivers.'}
                 </p>
               </div>
 
@@ -575,7 +615,7 @@ function App() {
                     Role
                   </p>
                   <p className="mt-2 text-lg font-semibold text-slate-900">
-                    {authUser?.role || 'Guest'}
+                    {roleLabel}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-white/60 bg-white/80 p-4 shadow-sm">
@@ -583,7 +623,11 @@ function App() {
                     Portal
                   </p>
                   <p className="mt-2 text-lg font-semibold text-slate-900">
-                    {activePortal === 'admin' ? 'Admin portal' : 'Payment portal'}
+                    {activePortal === 'admin'
+                      ? 'Admin portal'
+                      : activePortal === 'officer'
+                      ? 'Officer portal'
+                      : 'Payment portal'}
                   </p>
                 </div>
               </div>
@@ -604,6 +648,19 @@ function App() {
             <div className="space-y-6">
               {activePortal === 'payment' ? (
                 <PaymentForm isAuthenticated={Boolean(authUser)} />
+              ) : null}
+
+              {activePortal === 'officer' ? (
+                isOfficer ? (
+                  <OfficerFineForm authUser={authUser} />
+                ) : (
+                  <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+                    <p className="font-semibold text-slate-900">Officer access is required.</p>
+                    <p className="mt-2 text-sm text-slate-600">
+                      This page is reserved for users with the OFFICER role. Sign in with an officer account to create fines.
+                    </p>
+                  </div>
+                )
               ) : null}
 
               {activePortal === 'admin' ? (
