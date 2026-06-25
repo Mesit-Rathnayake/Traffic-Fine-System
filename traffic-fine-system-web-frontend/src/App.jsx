@@ -512,6 +512,7 @@ function App() {
   }, [])
 
   const isAdmin = authUser?.role === 'ADMIN'
+  const canAccessAdmin = !authUser || isAdmin
 
   const handleAuthChange = nextUser => {
     setAuthUser(nextUser)
@@ -527,12 +528,16 @@ function App() {
   }
 
   const handleAdminAccess = () => {
+    if (!canAccessAdmin) {
+      return
+    }
+
     setActivePortal(current => (current === 'admin' ? 'payment' : 'admin'))
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-neutral-bg app-shell">
-      <Header adminActive={activePortal === 'admin'} onAdminAccess={handleAdminAccess} />
+      <Header adminActive={activePortal === 'admin'} onAdminAccess={handleAdminAccess} disabled={!canAccessAdmin} />
       <main className="flex-grow px-4 py-8 md:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-7xl space-y-6">
           <section className="overflow-hidden rounded-[2rem] border border-slate-200 bg-[radial-gradient(circle_at_top_left,_rgba(255,183,107,0.24),_transparent_30%),linear-gradient(135deg,rgba(11,79,108,0.06),rgba(27,133,184,0.08))] p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] md:p-8">
