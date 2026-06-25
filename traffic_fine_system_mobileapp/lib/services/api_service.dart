@@ -13,8 +13,8 @@ class ApiService {
     BaseOptions(
       baseUrl: _baseUrl,
       headers: {'Content-Type': 'application/json'},
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
     ),
   );
 
@@ -86,12 +86,32 @@ class ApiService {
     return null;
   }
 
+  // File: lib/services/api_service.dart
+
+  // File: lib/services/api_service.dart
+
   static Future<bool> payFine(Map<String, dynamic> data) async {
     try {
-      final response = await dio.post('/payments/pay', data: data);
-      return response.statusCode == 200 || response.statusCode == 201;
+      final response = await dio.post(
+        '/payments/pay',
+        data: data,
+        options: Options(
+          // This tells Dio not to throw an error for 404 or other codes
+          validateStatus: (status) {
+            return status != null && status < 500;
+          },
+        ),
+      );
+
+      // Now we manually check if it was successful
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        print('Server returned error status: ${response.statusCode}');
+        return false;
+      }
     } catch (e) {
-      print('Error paying fine: $e');
+      print('Caught Dio error in payFine: $e');
       return false;
     }
   }

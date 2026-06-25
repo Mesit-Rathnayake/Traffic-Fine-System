@@ -58,6 +58,9 @@ export class AuthService {
   }
 
   async register(body: any) {
+      if (!body.username || !body.email || !body.password || !body.name) {
+      throw new BadRequestException('All fields (name, username, email, password) are required');
+    }
     const existingUsername = await this.usersService.findByUsername(
       body.username,
     );
