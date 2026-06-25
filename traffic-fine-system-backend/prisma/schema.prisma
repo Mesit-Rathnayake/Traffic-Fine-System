@@ -20,11 +20,11 @@ model User {
 }
 
 model Fine {
-  id               Int     @id @default(autoincrement())
-  referenceNumber  String  @unique
+  id               Int      @id @default(autoincrement())
+  referenceNumber  String   @unique
   category         String
   amount           Float
-  status           String  @default("PENDING")
+  status           String   @default("PENDING")
   officerId        Int
   district         String?
   payment          Payment?

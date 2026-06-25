@@ -1,4 +1,12 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { FinesService } from './fines.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -14,9 +22,16 @@ export class FinesController {
     return this.finesService.listFines();
   }
 
-  @Get(':referenceNumber')
-  getFine(@Param('referenceNumber') ref: string) {
-    return this.finesService.getFineByReference(ref);
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('OFFICER')
+  @Post()
+  createFine(@Body() body: any, @Req() req: any) {
+    return this.finesService.createFine({
+      category: body.category,
+      amount: Number(body.amount),
+      district: body.district,
+      officerId: req.user.userId,
+    });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -26,6 +41,7 @@ export class FinesController {
       message: 'Protected route working',
     };
   }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Get('admin-only')
@@ -33,5 +49,11 @@ export class FinesController {
     return {
       message: 'Welcome Admin',
     };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':referenceNumber')
+  getFine(@Param('referenceNumber') ref: string) {
+    return this.finesService.getFineByReference(ref);
   }
 }

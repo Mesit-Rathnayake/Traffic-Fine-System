@@ -12,35 +12,29 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-  return this.prisma.user.findUnique({
-    where: {
-      email: email, // This assumes your schema has 'email' marked as @unique
-    },
-  });
+    return this.prisma.user.findUnique({
+      where: { email },
+    });
   }
 
   async createUser(data: any) {
     return this.prisma.user.create({ data });
   }
 
-  // Add these to your current UsersService class
-  async findById(id: number) {
-    return this.prisma.user.findUnique({
-      where: { id },
-    });
-  }
-
-  async updateUser(id: number, data: any) {
-    const updatePayload: Record<string, string> = {};
-
-    if (typeof data?.name === 'string') updatePayload.name = data.name;
-    if (typeof data?.email === 'string') updatePayload.email = data.email;
-    if (typeof data?.phone === 'string') updatePayload.phone = data.phone;
-    if (typeof data?.license === 'string') updatePayload.license = data.license;
-
-    return this.prisma.user.update({
-      where: { id },
-      data: updatePayload,
+  async listUsers() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+        role: true,
+        phone: true,
+        license: true,
+      },
+      orderBy: {
+        id: 'desc',
+      },
     });
   }
 }
