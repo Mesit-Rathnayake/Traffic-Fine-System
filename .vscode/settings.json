@@ -1,3 +1,4 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic"
+  "java.compile.nullAnalysis.mode": "automatic",
+  "cmake.sourceDirectory": "C:/Shanilka/Traffic-Fine-System/traffic_fine_system_mobileapp/linux"
 }

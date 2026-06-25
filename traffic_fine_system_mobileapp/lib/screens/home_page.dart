@@ -113,9 +113,12 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // top row
+              // Inside _buildHeader -> Column -> children:
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment
+                    .spaceBetween, // Pushes elements to opposite sides
                 children: [
+                  // Left side: Icon + Title
                   Row(
                     children: [
                       Container(
@@ -138,17 +141,37 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.white,
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
-                          letterSpacing: 0.3,
                         ),
                       ),
                     ],
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.notifications_outlined,
-                        color: Colors.white, size: 22),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+                  // Right side: Notification + Logout in the same row
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.notifications_outlined,
+                          color: Colors.white,
+                          size: 22,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                      const SizedBox(width: 16), // Space between the two icons
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, '/login');
+                        },
+                        icon: const Icon(
+                          Icons.logout_rounded,
+                          color: _amber,
+                          size: 22,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -272,50 +295,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ── add tile ─────────────────────────────────────────────────────────────
-  Widget _buildAddTile() => GestureDetector(
-    onTap: () {},
-    child: Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFD8E2F0),
-          width: 1.5,
-          // dashed border approximation via solid with low opacity
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: _navy.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: _slate,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(Icons.add_rounded, color: _textMid, size: 22),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Add',
-            style: TextStyle(
-              color: _textMid,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
 
   // ── build ────────────────────────────────────────────────────────────────
   @override
@@ -366,9 +345,8 @@ class _HomePageState extends State<HomePage> {
                       mainAxisSpacing: 14,
                       childAspectRatio: 1.05,
                     ),
-                    itemCount: _items.length + 1,
+                    itemCount: _items.length,
                     itemBuilder: (context, i) {
-                      if (i == _items.length) return _buildAddTile();
                       return _buildActionCard(_items[i]);
                     },
                   ),
