@@ -48,6 +48,21 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
     confirmPassword: '',
   })
 
+  useEffect(() => {
+    if (!authUser) {
+      setMode('signin')
+      setMessage({ type: '', text: '' })
+      setSigninData({ username: '', password: '' })
+      setSignupData({
+        name: '',
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      })
+    }
+  }, [authUser])
+
   const persistAuth = nextUser => {
     const hydratedUser = hydrateAuthSession(nextUser)
     window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(hydratedUser))
