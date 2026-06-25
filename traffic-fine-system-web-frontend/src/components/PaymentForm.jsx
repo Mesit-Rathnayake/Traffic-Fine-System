@@ -2,19 +2,21 @@ import { useState } from 'react'
 import './PaymentForm.css'
 import { getFineByReference, payFine } from '../services/trafficFineApi'
 
+const INITIAL_FORM_DATA = {
+  fineReferenceNumber: '',
+  fineCategory: '',
+  fullName: '',
+  email: '',
+  phoneNumber: '',
+  licenseNumber: '',
+  amount: '',
+  cardNumber: '',
+  expiryDate: '',
+  cvv: ''
+}
+
 export default function PaymentForm({ isAuthenticated = false }) {
-  const [formData, setFormData] = useState({
-    fineReferenceNumber: '',
-    fineCategory: '',
-    fullName: '',
-    email: '',
-    phoneNumber: '',
-    licenseNumber: '',
-    amount: '',
-    cardNumber: '',
-    expiryDate: '',
-    cvv: ''
-  })
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA)
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ type: '', text: '' })
@@ -446,9 +448,14 @@ export default function PaymentForm({ isAuthenticated = false }) {
             {loading ? 'Processing...' : isAuthenticated ? 'Pay Now' : 'Sign in to Pay'}
           </button>
           <button
-            type="reset"
+            type="button"
             className="px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-all duration-200"
-            onClick={() => setMessage({ type: '', text: '' })}
+            onClick={() => {
+              setFormData(INITIAL_FORM_DATA)
+              setFineRecord(null)
+              setMessage({ type: '', text: '' })
+              setLookupLoading(false)
+            }}
           >
             Clear
           </button>
