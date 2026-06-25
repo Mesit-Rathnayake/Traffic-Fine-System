@@ -48,13 +48,28 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
     confirmPassword: '',
   })
 
-  const persistAuth = (nextUser) => {
+  useEffect(() => {
+    if (!authUser) {
+      setMode('signin')
+      setMessage({ type: '', text: '' })
+      setSigninData({ username: '', password: '' })
+      setSignupData({
+        name: '',
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      })
+    }
+  }, [authUser])
+
+  const persistAuth = nextUser => {
     const hydratedUser = hydrateAuthSession(nextUser)
     window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(hydratedUser))
     onAuthChange(hydratedUser)
   }
 
-  const handleSignIn = async (event) => {
+  const handleSignIn = async event => {
     event.preventDefault()
 
     if (!signinData.username.trim() || !signinData.password) {
@@ -91,7 +106,7 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
     }
   }
 
-  const handleSignUp = async (event) => {
+  const handleSignUp = async event => {
     event.preventDefault()
 
     if (
@@ -198,7 +213,9 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-orange">
             Driver access
           </p>
-          <h2 className="text-2xl font-bold text-secondary-dark mt-2">Sign in or create an account</h2>
+          <h2 className="text-2xl font-bold text-secondary-dark mt-2">
+            Sign in or create an account
+          </h2>
         </div>
       </div>
 
@@ -246,8 +263,8 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
             <input
               type="text"
               value={signinData.username}
-              onChange={(event) =>
-                setSigninData((current) => ({ ...current, username: event.target.value }))
+              onChange={event =>
+                setSigninData(current => ({ ...current, username: event.target.value }))
               }
               className="input-field"
               placeholder="Enter username"
@@ -259,8 +276,8 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
             <input
               type="password"
               value={signinData.password}
-              onChange={(event) =>
-                setSigninData((current) => ({ ...current, password: event.target.value }))
+              onChange={event =>
+                setSigninData(current => ({ ...current, password: event.target.value }))
               }
               className="input-field"
               placeholder="Enter password"
@@ -280,8 +297,8 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
             <input
               type="text"
               value={signupData.name}
-              onChange={(event) =>
-                setSignupData((current) => ({ ...current, name: event.target.value }))
+              onChange={event =>
+                setSignupData(current => ({ ...current, name: event.target.value }))
               }
               className="input-field"
               placeholder="Enter your full name"
@@ -293,8 +310,8 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
             <input
               type="text"
               value={signupData.username}
-              onChange={(event) =>
-                setSignupData((current) => ({ ...current, username: event.target.value }))
+              onChange={event =>
+                setSignupData(current => ({ ...current, username: event.target.value }))
               }
               className="input-field"
               placeholder="Choose a username"
@@ -306,8 +323,8 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
             <input
               type="email"
               value={signupData.email}
-              onChange={(event) =>
-                setSignupData((current) => ({ ...current, email: event.target.value }))
+              onChange={event =>
+                setSignupData(current => ({ ...current, email: event.target.value }))
               }
               className="input-field"
               placeholder="Enter your email"
@@ -320,8 +337,8 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
             <input
               type="password"
               value={signupData.password}
-              onChange={(event) =>
-                setSignupData((current) => ({ ...current, password: event.target.value }))
+              onChange={event =>
+                setSignupData(current => ({ ...current, password: event.target.value }))
               }
               className="input-field"
               placeholder="Create a password"
@@ -333,8 +350,8 @@ function AuthPanel({ authUser, onAuthChange, onSignOut }) {
             <input
               type="password"
               value={signupData.confirmPassword}
-              onChange={(event) =>
-                setSignupData((current) => ({ ...current, confirmPassword: event.target.value }))
+              onChange={event =>
+                setSignupData(current => ({ ...current, confirmPassword: event.target.value }))
               }
               className="input-field"
               placeholder="Repeat the password"
@@ -357,13 +374,13 @@ function AdminAccessPanel({ authUser, onAuthChange, onBackToPayments }) {
   const [message, setMessage] = useState({ type: '', text: '' })
   const [credentials, setCredentials] = useState({ username: '', password: '' })
 
-  const persistAuth = (nextUser) => {
+  const persistAuth = nextUser => {
     const hydratedUser = hydrateAuthSession(nextUser)
     window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(hydratedUser))
     onAuthChange(hydratedUser)
   }
 
-  const handleAdminSignIn = async (event) => {
+  const handleAdminSignIn = async event => {
     event.preventDefault()
 
     if (!credentials.username.trim() || !credentials.password) {
@@ -414,7 +431,9 @@ function AdminAccessPanel({ authUser, onAuthChange, onBackToPayments }) {
     <section className="w-full rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm md:p-8">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Admin access</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+            Admin access
+          </p>
           <h2 className="mt-2 text-2xl font-bold text-slate-900">Locked admin portal</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             This area is separate from driver sign-up. Admin accounts are provisioned by the backend
@@ -448,8 +467,8 @@ function AdminAccessPanel({ authUser, onAuthChange, onBackToPayments }) {
           <input
             type="text"
             value={credentials.username}
-            onChange={(event) =>
-              setCredentials((current) => ({ ...current, username: event.target.value }))
+            onChange={event =>
+              setCredentials(current => ({ ...current, username: event.target.value }))
             }
             className="input-field"
             placeholder="Enter admin username"
@@ -461,8 +480,8 @@ function AdminAccessPanel({ authUser, onAuthChange, onBackToPayments }) {
           <input
             type="password"
             value={credentials.password}
-            onChange={(event) =>
-              setCredentials((current) => ({ ...current, password: event.target.value }))
+            onChange={event =>
+              setCredentials(current => ({ ...current, password: event.target.value }))
             }
             className="input-field"
             placeholder="Enter admin password"
@@ -473,13 +492,15 @@ function AdminAccessPanel({ authUser, onAuthChange, onBackToPayments }) {
           {loading ? 'Opening admin portal...' : 'Open admin portal'}
         </button>
         <p className="text-xs leading-5 text-slate-500">
-          If you need a new admin account, create it in the backend or seed it directly in the database.
+          If you need a new admin account, create it in the backend or seed it directly in the
+          database.
         </p>
       </form>
 
       {authUser?.role === 'ADMIN' ? (
         <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
-          You are already signed in as an ADMIN user. Use the header lock icon or go back to open the dashboard.
+          You are already signed in as an ADMIN user. Use the header lock icon or go back to open
+          the dashboard.
         </div>
       ) : null}
     </section>
@@ -506,8 +527,9 @@ function App() {
   }, [])
 
   const isAdmin = authUser?.role === 'ADMIN'
+  const canAccessAdmin = !authUser || isAdmin
 
-  const handleAuthChange = (nextUser) => {
+  const handleAuthChange = nextUser => {
     setAuthUser(nextUser)
     if (nextUser?.role === 'ADMIN') {
       setActivePortal('admin')
@@ -521,12 +543,16 @@ function App() {
   }
 
   const handleAdminAccess = () => {
-    setActivePortal((current) => (current === 'admin' ? 'payment' : 'admin'))
+    if (!canAccessAdmin) {
+      return
+    }
+
+    setActivePortal(current => (current === 'admin' ? 'payment' : 'admin'))
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-neutral-bg app-shell">
-      <Header adminActive={activePortal === 'admin'} onAdminAccess={handleAdminAccess} />
+      <Header adminActive={activePortal === 'admin'} onAdminAccess={handleAdminAccess} disabled={!canAccessAdmin} />
       <main className="flex-grow px-4 py-8 md:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-7xl space-y-6">
           <section className="overflow-hidden rounded-[2rem] border border-slate-200 bg-[radial-gradient(circle_at_top_left,_rgba(255,183,107,0.24),_transparent_30%),linear-gradient(135deg,rgba(11,79,108,0.06),rgba(27,133,184,0.08))] p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] md:p-8">
@@ -536,21 +562,26 @@ function App() {
                   Unified traffic fine portal
                 </p>
                 <h2 className="text-3xl font-bold leading-tight text-slate-900 md:text-5xl">
-                  Driver payments first. Admin operations behind a separate locked entry.
+                  Driver payments first.
                 </h2>
                 <p className="max-w-2xl text-sm leading-6 text-slate-600 md:text-base">
-                  Use the public sign-in and sign-up flow for drivers, or open the small lock icon in
-                  the header to switch to the dedicated admin portal.
+                  Use the public sign-in and sign-up flow for drivers.
                 </p>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2 lg:min-w-[24rem] lg:grid-cols-2">
                 <div className="rounded-2xl border border-white/60 bg-white/80 p-4 shadow-sm">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Role</p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900">{authUser?.role || 'Guest'}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                    Role
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-slate-900">
+                    {authUser?.role || 'Guest'}
+                  </p>
                 </div>
                 <div className="rounded-2xl border border-white/60 bg-white/80 p-4 shadow-sm">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Portal</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                    Portal
+                  </p>
                   <p className="mt-2 text-lg font-semibold text-slate-900">
                     {activePortal === 'admin' ? 'Admin portal' : 'Payment portal'}
                   </p>
@@ -560,32 +591,21 @@ function App() {
           </section>
 
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1.05fr]">
+            {/* Left Column */}
             <div className="space-y-6">
               <AuthPanel
                 authUser={authUser}
                 onAuthChange={handleAuthChange}
                 onSignOut={handleSignOut}
               />
-
-              {!isAdmin && activePortal !== 'admin' ? (
-                <section className="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.06)]">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary-orange">
-                    Admin access
-                  </p>
-                  <h3 className="mt-2 text-xl font-semibold text-slate-900">
-                    Use the header lock icon for the admin portal.
-                  </h3>
-                  <p className="mt-3 text-sm leading-6 text-slate-600">
-                    Admin access is intentionally tucked away from the normal user flow. It uses a
-                    separate sign-in panel and only opens for ADMIN accounts.
-                  </p>
-                </section>
-              ) : null}
-
-              {activePortal === 'payment' ? <PaymentForm isAuthenticated={Boolean(authUser)} /> : null}
             </div>
 
+            {/* Right Column */}
             <div className="space-y-6">
+              {activePortal === 'payment' ? (
+                <PaymentForm isAuthenticated={Boolean(authUser)} />
+              ) : null}
+
               {activePortal === 'admin' ? (
                 isAdmin ? (
                   <AdminDashboard authUser={authUser} />

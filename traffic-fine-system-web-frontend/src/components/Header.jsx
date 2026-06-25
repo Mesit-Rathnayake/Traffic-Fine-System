@@ -1,4 +1,4 @@
-export default function Header({ adminActive = false, onAdminAccess }) {
+export default function Header({ adminActive = false, onAdminAccess, disabled = false }) {
   return (
     <header className="bg-slate-950 text-white shadow-[0_18px_60px_rgba(15,23,42,0.28)]">
       <div className="mx-auto max-w-7xl px-4 py-6 md:px-6 lg:px-8">
@@ -11,13 +11,16 @@ export default function Header({ adminActive = false, onAdminAccess }) {
           </div>
           <button
             type="button"
-            onClick={onAdminAccess}
+            onClick={disabled ? undefined : onAdminAccess}
+            disabled={disabled}
             className={`inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] transition ${
               adminActive
                 ? 'border-white bg-white text-slate-950'
                 : 'border-white/10 bg-white/5 text-slate-200 hover:bg-white/10 hover:text-white'
-            }`}
+            } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
             aria-label="Open admin portal"
+            aria-disabled={disabled}
+            title={disabled ? 'Admin access is not available while signed in as a driver' : 'Open admin portal'}
           >
             <span aria-hidden="true">🔒</span>
             Admin
