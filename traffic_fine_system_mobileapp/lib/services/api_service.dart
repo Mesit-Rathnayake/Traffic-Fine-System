@@ -32,10 +32,10 @@ class ApiService {
 
   static Future<bool> login(String email, String password) async {
     try {
-      final response = await dio.post('/auth/login', data: {
-        'email': email,
-        'password': password,
-      });
+      final response = await dio.post(
+        '/auth/login',
+        data: {'email': email, 'password': password},
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         currentUser = response.data['user'];
@@ -86,10 +86,6 @@ class ApiService {
     return null;
   }
 
-  // File: lib/services/api_service.dart
-
-  // File: lib/services/api_service.dart
-
   static Future<bool> payFine(Map<String, dynamic> data) async {
     try {
       final response = await dio.post(
@@ -114,5 +110,45 @@ class ApiService {
       print('Caught Dio error in payFine: $e');
       return false;
     }
+  }
+
+  // Add these to lib/services/api_service.dart
+
+  static Future<Map<String, dynamic>> getAdminDashboardData() async {
+    try {
+      // You can fetch all required data in one go if you have a consolidated endpoint,
+      // or perform multiple requests here.
+      final responses = await Future.wait([
+        dio.get('/admin/total-collections'),
+        dio.get('/admin/district-collections'),
+        dio.get('/admin/category-breakdown'),
+        dio.get('/admin/users'),
+        dio.get('/admin/fines'),
+        dio.get('/admin/payments'),
+      ]);
+
+      return {
+        'totalCollections': responses[0].data['total'],
+        'districtCollections': responses[1].data,
+        'categoryBreakdown': responses[2].data,
+        'users': responses[3].data,
+        'fines': responses[4].data,
+        'payments': responses[5].data,
+      };
+    } catch (e) {
+      print('Error fetching admin data: $e');
+      throw e;
+    }
+  }
+
+  static Future<Map<String, dynamic>> checkAdminAccess() async {
+    final response = await dio.get('/fines/admin-only');
+    final data = response.data;
+
+    if (data is Map<String, dynamic>) {
+      return data;
+    }
+
+    return {'message': data?.toString() ?? 'Admin route access confirmed.'};
   }
 }

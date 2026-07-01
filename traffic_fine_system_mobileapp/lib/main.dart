@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'screens/officer_fine_page.dart';
 import 'screens/home_page.dart';
 import 'services/api_service.dart';
 
@@ -486,7 +487,6 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _obscure = true;
 
-  
   @override
   void dispose() {
     _emailController.dispose();
@@ -504,7 +504,17 @@ class _LoginPageState extends State<LoginPage> {
 
       if (success) {
         if (mounted) {
-          Navigator.pushReplacementNamed(context, '/home');
+          final role = ApiService.currentUser?['role']
+              ?.toString()
+              .toUpperCase();
+          if (role == 'OFFICER') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const OfficerFinePage()),
+            );
+          } else {
+            Navigator.pushReplacementNamed(context, '/home');
+          }
         }
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -523,7 +533,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: kBg,
       body: Center(
@@ -780,7 +789,9 @@ class _SignupPageState extends State<SignupPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration failed. Please try again.')),
+          const SnackBar(
+            content: Text('Registration failed. Please try again.'),
+          ),
         );
       }
       print('Registration Error: $e');
@@ -949,7 +960,7 @@ class _SignupPageState extends State<SignupPage> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState?.validate() ?? false) {
-                       _registerUser();
+                        _registerUser();
                       }
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: kDarkTeal),
@@ -1006,7 +1017,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _incrementCounter() {
     setState(() {
-            _counter++;
+      _counter++;
     });
   }
 

@@ -49,7 +49,7 @@ export class FinesController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'OFFICER')
   @Get('admin-only')
   adminOnlyRoute() {
     return {

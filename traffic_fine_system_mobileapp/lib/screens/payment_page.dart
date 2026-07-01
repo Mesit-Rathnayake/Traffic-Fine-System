@@ -22,6 +22,10 @@ class _PaymentPageState extends State<PaymentPage> {
 
   String? _category;
   bool _loading = false;
+  bool _lookupLoading = false;
+  String? _lookupMessage;
+  bool _lookupIsError = false;
+  Map<String, dynamic>? _loadedFine;
 
   final List<Map<String, String>> _categories = [
     {'value': 'SPEEDING', 'label': 'Speeding'},
@@ -58,7 +62,78 @@ class _PaymentPageState extends State<PaymentPage> {
       _expiry.clear();
       _cvv.clear();
       _category = null;
+      _lookupMessage = null;
+      _lookupIsError = false;
+      _loadedFine = null;
     });
+  }
+
+  String _formatDate(dynamic value) {
+    final parsed = DateTime.tryParse(value?.toString() ?? '');
+    if (parsed == null) return value?.toString() ?? 'N/A';
+    return '${parsed.day.toString().padLeft(2, '0')}/${parsed.month.toString().padLeft(2, '0')}/${parsed.year}';
+  }
+
+  String _formatAmount(dynamic value) {
+    final amount = double.tryParse(value?.toString() ?? '') ?? 0;
+    final decimals = amount == amount.roundToDouble() ? 0 : 2;
+    return amount.toStringAsFixed(decimals);
+  }
+
+  Future<void> _lookupFine() async {
+    final reference = _fineRef.text.trim();
+
+    if (reference.isEmpty) {
+      setState(() {
+        _lookupMessage = 'Enter a fine reference number first.';
+        _lookupIsError = true;
+        _loadedFine = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _lookupLoading = true;
+      _lookupMessage = null;
+      _lookupIsError = false;
+    });
+
+    try {
+      final fine = await ApiService.fetchFine(reference);
+      if (!mounted) return;
+
+      if (fine == null) {
+        setState(() {
+          _loadedFine = null;
+          _lookupMessage = 'No fine found for that reference number.';
+          _lookupIsError = true;
+        });
+        return;
+      }
+
+      final normalizedCategory = fine['category']?.toString().toUpperCase();
+      setState(() {
+        _loadedFine = fine;
+        _lookupMessage = 'Fine loaded. Review the details before paying.';
+        _lookupIsError = false;
+        _category = _categories.any((cat) => cat['value'] == normalizedCategory)
+            ? normalizedCategory
+            : _category;
+        _amount.text = _formatAmount(fine['amount']);
+        _fullName.text = fine['driverName']?.toString() ?? _fullName.text;
+        _license.text = fine['driverLicense']?.toString() ?? _license.text;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _loadedFine = null;
+        _lookupMessage = error.toString().replaceFirst('Exception: ', '');
+        _lookupIsError = true;
+      });
+    } finally {
+      if (!mounted) return;
+      setState(() => _lookupLoading = false);
+    }
   }
 
   String _formatCard(String v) {
@@ -115,13 +190,19 @@ class _PaymentPageState extends State<PaymentPage> {
         _clear();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Payment failed. Check the reference number and try again.')),
+          const SnackBar(
+            content: Text(
+              'Payment failed. Check the reference number and try again.',
+            ),
+          ),
         );
       }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to connect to the payment service.')),
+        const SnackBar(
+          content: Text('Unable to connect to the payment service.'),
+        ),
       );
     } finally {
       if (mounted) {
@@ -255,6 +336,82 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Widget _gap([double h = 14]) => SizedBox(height: h);
 
+  Widget _buildLookupSummary() {
+    if (_loadedFine == null) return const SizedBox.shrink();
+
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FBFF),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFD7E3F4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Loaded fine',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF123B73),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _loadedFine!['referenceNumber']?.toString() ?? 'N/A',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF0D2B55),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _infoChip(
+                'Driver',
+                _loadedFine!['driverName']?.toString() ?? 'N/A',
+              ),
+              _infoChip(
+                'License',
+                _loadedFine!['driverLicense']?.toString() ?? 'N/A',
+              ),
+              _infoChip(
+                'Vehicle',
+                _loadedFine!['vehicleNumber']?.toString() ?? 'N/A',
+              ),
+              _infoChip(
+                'Amount',
+                'LKR ${_formatAmount(_loadedFine!['amount'])}',
+              ),
+              _infoChip('Status', _loadedFine!['status']?.toString() ?? 'N/A'),
+              _infoChip('Date', _formatDate(_loadedFine!['offenseDate'])),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoChip(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Text(
+        '$label: $value',
+        style: const TextStyle(fontSize: 12, color: Color(0xFF374151)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
@@ -353,14 +510,68 @@ class _PaymentPageState extends State<PaymentPage> {
                 _label('Reference Number'),
                 TextFormField(
                   controller: _fineRef,
-                  decoration: _inputDec(
-                    hint: 'e.g. TF-2024-00123',
-                    icon: Icons.tag,
-                  ),
+                  textInputAction: TextInputAction.search,
+                  onFieldSubmitted: (_) => _lookupFine(),
+                  decoration:
+                      _inputDec(
+                        hint: 'e.g. TF-2024-00123',
+                        icon: Icons.tag,
+                        suffix: null,
+                      ).copyWith(
+                        suffixIcon: IconButton(
+                          onPressed: _lookupLoading ? null : _lookupFine,
+                          icon: _lookupLoading
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.search_rounded),
+                          tooltip: 'Load fine data',
+                        ),
+                      ),
                   validator: (v) => (v == null || v.trim().isEmpty)
                       ? 'Fine reference number is required'
                       : null,
                 ),
+                const SizedBox(height: 8),
+                Text(
+                  _lookupLoading
+                      ? 'Loading fine data...'
+                      : 'Tap the search icon or press Enter to load the fine.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
+                if (_lookupMessage != null) ...[
+                  const SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: _lookupIsError
+                          ? const Color(0xFFFFE6E6)
+                          : const Color(0xFFE8F8EF),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: _lookupIsError
+                            ? const Color(0xFFE3A7A7)
+                            : const Color(0xFFB5E3C8),
+                      ),
+                    ),
+                    child: Text(
+                      _lookupMessage!,
+                      style: TextStyle(
+                        color: _lookupIsError
+                            ? const Color(0xFF8A1F1F)
+                            : const Color(0xFF1E6B3D),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+                _buildLookupSummary(),
                 _gap(),
                 _label('Fine Category'),
                 DropdownButtonFormField<String>(

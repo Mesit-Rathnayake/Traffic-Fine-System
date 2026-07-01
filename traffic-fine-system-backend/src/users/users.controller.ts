@@ -34,7 +34,7 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'OFFICER')
   @Post('create-officer')
   async createOfficer(@Body() body: any) {
     const existingUsername = await this.usersService.findByUsername(
@@ -78,7 +78,7 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'OFFICER')
   @Get()
   listUsers() {
     return this.usersService.listUsers();

@@ -14,12 +14,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // ── palette ──────────────────────────────────────────────────────────────
-  static const _navy      = Color(0xFF0D2B55);
-  static const _blue      = Color(0xFF1A6FD4);
-  static const _amber     = Color(0xFFF5A623);
-  static const _slate     = Color(0xFFF0F4FA);
-  static const _textDark  = Color(0xFF0D2B55);
-  static const _textMid   = Color(0xFF6B7A99);
+  static const _navy = Color(0xFF0D2B55);
+  static const _blue = Color(0xFF1A6FD4);
+  static const _amber = Color(0xFFF5A623);
+  static const _slate = Color(0xFFF0F4FA);
+  static const _textDark = Color(0xFF0D2B55);
+  static const _textMid = Color(0xFF6B7A99);
 
   String _getGreeting() {
     final hour = DateTime.now().hour; // Gets the current hour (0-23)
@@ -33,8 +33,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // ── menu items (logic unchanged) ────────────────────────────────────────
-  final List<_MenuItem> _items = [
+  List<_MenuItem> _itemsForRole() => [
     _MenuItem(
       label: 'Pay Fine',
       subtitle: 'Settle outstanding fines',
@@ -198,7 +197,10 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 16),
               // outstanding fines banner
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: _amber.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
@@ -212,8 +214,11 @@ class _HomePageState extends State<HomePage> {
                         color: _amber.withOpacity(0.2),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.warning_amber_rounded,
-                          color: _amber, size: 16),
+                      child: const Icon(
+                        Icons.warning_amber_rounded,
+                        color: _amber,
+                        size: 16,
+                      ),
                     ),
                     const SizedBox(width: 10),
                     const Expanded(
@@ -226,8 +231,11 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    const Icon(Icons.chevron_right_rounded,
-                        color: Colors.white54, size: 18),
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: Colors.white54,
+                      size: 18,
+                    ),
                   ],
                 ),
               ),
@@ -241,7 +249,7 @@ class _HomePageState extends State<HomePage> {
   // ── action card ──────────────────────────────────────────────────────────
   Widget _buildActionCard(_MenuItem it) {
     return GestureDetector(
-      onTap: () => _onTapItem(it),
+      onTap: it.onTap ?? () => _onTapItem(it),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -295,18 +303,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
   // ── build ────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
+    final items = _itemsForRole();
     String userName = ApiService.currentUser?['name'] ?? 'User';
     return Scaffold(
       backgroundColor: _slate,
-      appBar: AppBar(
-        toolbarHeight: 0,
-        backgroundColor: _navy,
-        elevation: 0,
-      ),
+      appBar: AppBar(toolbarHeight: 0, backgroundColor: _navy, elevation: 0),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -329,10 +333,7 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 4),
                   const Text(
                     'What would you like to do today?',
-                    style: TextStyle(
-                      color: _textMid,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: _textMid, fontSize: 13),
                   ),
                   const SizedBox(height: 16),
                   GridView.builder(
@@ -340,14 +341,14 @@ class _HomePageState extends State<HomePage> {
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 14,
-                      mainAxisSpacing: 14,
-                      childAspectRatio: 1.05,
-                    ),
-                    itemCount: _items.length,
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 14,
+                          mainAxisSpacing: 14,
+                          childAspectRatio: 1.05,
+                        ),
+                    itemCount: items.length,
                     itemBuilder: (context, i) {
-                      return _buildActionCard(_items[i]);
+                      return _buildActionCard(items[i]);
                     },
                   ),
                 ],
