@@ -23,6 +23,22 @@ export default function PaymentForm({ isAuthenticated = false }) {
   const [fineRecord, setFineRecord] = useState(null)
   const [lookupLoading, setLookupLoading] = useState(false)
 
+  const fineDetailRows = fineRecord
+    ? [
+        { label: 'Reference', value: fineRecord.referenceNumber },
+        { label: 'Category', value: fineRecord.category },
+        { label: 'Amount', value: `LKR ${Number(fineRecord.amount || 0).toFixed(2)}` },
+        { label: 'Status', value: fineRecord.status },
+        { label: 'Driver', value: fineRecord.driverName },
+        { label: 'License', value: fineRecord.driverLicense },
+        { label: 'Vehicle', value: fineRecord.vehicleNumber },
+        { label: 'Offense date', value: fineRecord.offenseDate },
+        { label: 'Location', value: fineRecord.offenseLocation },
+        { label: 'District', value: fineRecord.district },
+        { label: 'Notes', value: fineRecord.notes },
+      ]
+    : []
+
   const fineCategories = [
     { value: 'SPEEDING', label: 'Speeding' },
     { value: 'RED_LIGHT', label: 'Running Red Light' },
@@ -100,6 +116,14 @@ export default function PaymentForm({ isAuthenticated = false }) {
     }
     if (!formData.fineCategory) {
       setMessage({ type: 'error', text: 'Please select a fine category' })
+      return false
+    }
+    if (!fineRecord) {
+      setMessage({ type: 'error', text: 'Load the fine details before paying.' })
+      return false
+    }
+    if (fineRecord.status === 'PAID') {
+      setMessage({ type: 'error', text: 'This fine has already been paid.' })
       return false
     }
     if (!formData.fullName.trim()) {
@@ -235,9 +259,17 @@ export default function PaymentForm({ isAuthenticated = false }) {
                 </button>
               </div>
               {fineRecord ? (
-                <p className="mt-2 text-sm text-gray-600">
-                  Current status: <span className="font-semibold">{fineRecord.status}</span>
-                </p>
+                <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                  <p className="font-semibold text-slate-900">Fine details loaded</p>
+                  <div className="mt-3 grid gap-2 md:grid-cols-2">
+                    {fineDetailRows.map((item) => (
+                      <div key={item.label} className="rounded-xl bg-white px-3 py-2">
+                        <p className="text-xs uppercase tracking-[0.16em] text-slate-500">{item.label}</p>
+                        <p className="mt-1 font-medium text-slate-900">{item.value || 'N/A'}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               ) : null}
             </div>
 
@@ -251,6 +283,7 @@ export default function PaymentForm({ isAuthenticated = false }) {
                 onChange={handleChange}
                 className="input-field"
                 required
+                disabled={Boolean(fineRecord)}
               >
                 <option value="">Select a category</option>
                 {fineCategories.map(cat => (
