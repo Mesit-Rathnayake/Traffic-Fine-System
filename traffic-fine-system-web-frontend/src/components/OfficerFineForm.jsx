@@ -15,6 +15,12 @@ export default function OfficerFineForm({ authUser }) {
     category: '',
     amount: '',
     district: '',
+    driverName: '',
+    driverLicense: '',
+    vehicleNumber: '',
+    offenseDate: '',
+    offenseLocation: '',
+    notes: '',
   })
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState({ type: '', text: '' })
@@ -38,6 +44,26 @@ export default function OfficerFineForm({ authUser }) {
       setMessage({ type: 'error', text: 'Enter a valid fine amount.' })
       return false
     }
+    if (!formData.driverName.trim()) {
+      setMessage({ type: 'error', text: 'Enter the driver name.' })
+      return false
+    }
+    if (!formData.driverLicense.trim()) {
+      setMessage({ type: 'error', text: 'Enter the driver license number.' })
+      return false
+    }
+    if (!formData.vehicleNumber.trim()) {
+      setMessage({ type: 'error', text: 'Enter the vehicle number.' })
+      return false
+    }
+    if (!formData.offenseDate.trim()) {
+      setMessage({ type: 'error', text: 'Select the offense date.' })
+      return false
+    }
+    if (!formData.offenseLocation.trim()) {
+      setMessage({ type: 'error', text: 'Enter the offense location.' })
+      return false
+    }
     return true
   }
 
@@ -55,11 +81,27 @@ export default function OfficerFineForm({ authUser }) {
         category: formData.category,
         amount: Number(formData.amount),
         district: formData.district.trim() || undefined,
+        driverName: formData.driverName.trim(),
+        driverLicense: formData.driverLicense.trim(),
+        vehicleNumber: formData.vehicleNumber.trim(),
+        offenseDate: formData.offenseDate,
+        offenseLocation: formData.offenseLocation.trim(),
+        notes: formData.notes.trim() || undefined,
       })
 
       setCreatedFine(response.fine)
       setMessage({ type: 'success', text: 'Fine created successfully.' })
-      setFormData({ category: '', amount: '', district: '' })
+      setFormData({
+        category: '',
+        amount: '',
+        district: '',
+        driverName: '',
+        driverLicense: '',
+        vehicleNumber: '',
+        offenseDate: '',
+        offenseLocation: '',
+        notes: '',
+      })
     } catch (error) {
       setMessage({
         type: 'error',
@@ -71,7 +113,17 @@ export default function OfficerFineForm({ authUser }) {
   }
 
   const handleClear = () => {
-    setFormData({ category: '', amount: '', district: '' })
+    setFormData({
+      category: '',
+      amount: '',
+      district: '',
+      driverName: '',
+      driverLicense: '',
+      vehicleNumber: '',
+      offenseDate: '',
+      offenseLocation: '',
+      notes: '',
+    })
     setMessage({ type: '', text: '' })
     setCreatedFine(null)
   }
@@ -100,6 +152,14 @@ export default function OfficerFineForm({ authUser }) {
           <p className="text-sm font-semibold text-slate-700">Created fine reference</p>
           <p className="mt-2 text-lg font-bold text-slate-900">{createdFine.referenceNumber}</p>
           <p className="mt-1 text-sm text-slate-600">Status: {createdFine.status}</p>
+          <div className="mt-4 grid gap-3 text-sm text-slate-700 md:grid-cols-2">
+            <div><span className="font-semibold text-slate-500">Driver:</span> {createdFine.driverName || 'N/A'}</div>
+            <div><span className="font-semibold text-slate-500">License:</span> {createdFine.driverLicense || 'N/A'}</div>
+            <div><span className="font-semibold text-slate-500">Vehicle:</span> {createdFine.vehicleNumber || 'N/A'}</div>
+            <div><span className="font-semibold text-slate-500">Offense date:</span> {createdFine.offenseDate || 'N/A'}</div>
+            <div><span className="font-semibold text-slate-500">Location:</span> {createdFine.offenseLocation || 'N/A'}</div>
+            <div><span className="font-semibold text-slate-500">Notes:</span> {createdFine.notes || 'N/A'}</div>
+          </div>
         </div>
       ) : null}
 
@@ -109,7 +169,7 @@ export default function OfficerFineForm({ authUser }) {
             Fine details
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Fine category *
@@ -158,6 +218,93 @@ export default function OfficerFineForm({ authUser }) {
                 onChange={handleChange}
                 className="input-field"
                 placeholder="Enter district or location"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Driver name *
+              </label>
+              <input
+                type="text"
+                name="driverName"
+                value={formData.driverName}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="Enter driver name"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Driver license number *
+              </label>
+              <input
+                type="text"
+                name="driverLicense"
+                value={formData.driverLicense}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="Enter license number"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Vehicle number *
+              </label>
+              <input
+                type="text"
+                name="vehicleNumber"
+                value={formData.vehicleNumber}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="Enter vehicle number"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Offense date *
+              </label>
+              <input
+                type="date"
+                name="offenseDate"
+                value={formData.offenseDate}
+                onChange={handleChange}
+                className="input-field"
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Offense location *
+              </label>
+              <input
+                type="text"
+                name="offenseLocation"
+                value={formData.offenseLocation}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="Enter location of the offense"
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Additional notes
+              </label>
+              <textarea
+                name="notes"
+                value={formData.notes}
+                onChange={handleChange}
+                className="input-field min-h-[110px]"
+                placeholder="Optional remarks from the officer"
               />
             </div>
           </div>

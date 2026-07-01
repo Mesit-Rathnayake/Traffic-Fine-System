@@ -426,6 +426,30 @@ export default function AdminDashboard({ authUser }) {
                   <p className="text-slate-500">Officer</p>
                   <p className="font-medium text-slate-900">{lookupFine.officerId ?? 'N/A'}</p>
                 </div>
+                <div>
+                  <p className="text-slate-500">Driver</p>
+                  <p className="font-medium text-slate-900">{lookupFine.driverName || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-slate-500">License</p>
+                  <p className="font-medium text-slate-900">{lookupFine.driverLicense || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-slate-500">Vehicle</p>
+                  <p className="font-medium text-slate-900">{lookupFine.vehicleNumber || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-slate-500">Offense date</p>
+                  <p className="font-medium text-slate-900">{lookupFine.offenseDate || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-slate-500">Location</p>
+                  <p className="font-medium text-slate-900">{lookupFine.offenseLocation || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-slate-500">Notes</p>
+                  <p className="font-medium text-slate-900">{lookupFine.notes || 'N/A'}</p>
+                </div>
               </div>
             </div>
           ) : null}

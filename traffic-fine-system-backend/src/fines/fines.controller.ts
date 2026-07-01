@@ -30,6 +30,12 @@ export class FinesController {
       category: body.category,
       amount: Number(body.amount),
       district: body.district,
+      driverName: body.driverName,
+      driverLicense: body.driverLicense,
+      vehicleNumber: body.vehicleNumber,
+      offenseDate: body.offenseDate,
+      offenseLocation: body.offenseLocation,
+      notes: body.notes,
       officerId: req.user.userId,
     });
   }

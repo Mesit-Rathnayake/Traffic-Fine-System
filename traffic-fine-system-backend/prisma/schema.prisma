@@ -27,6 +27,12 @@ model Fine {
   status           String   @default("PENDING")
   officerId        Int
   district         String?
+  driverName       String?
+  driverLicense    String?
+  vehicleNumber    String?
+  offenseDate      String?
+  offenseLocation  String?
+  notes            String?
   payment          Payment?
 }
 

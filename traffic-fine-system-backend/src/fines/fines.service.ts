@@ -21,6 +21,12 @@ export class FinesService {
     category: string;
     amount: number;
     district?: string;
+    driverName?: string;
+    driverLicense?: string;
+    vehicleNumber?: string;
+    offenseDate?: string;
+    offenseLocation?: string;
+    notes?: string;
     officerId: number;
   }) {
     if (!data.category || !data.amount || data.amount <= 0) {
@@ -35,6 +41,12 @@ export class FinesService {
         category: data.category,
         amount: data.amount,
         district: data.district || null,
+        driverName: data.driverName || null,
+        driverLicense: data.driverLicense || null,
+        vehicleNumber: data.vehicleNumber || null,
+        offenseDate: data.offenseDate || null,
+        offenseLocation: data.offenseLocation || null,
+        notes: data.notes || null,
         officerId: data.officerId,
         status: 'PENDING',
       },

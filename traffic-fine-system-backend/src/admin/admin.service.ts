@@ -106,6 +106,12 @@ export class AdminService {
         status: true,
         district: true,
         officerId: true,
+        driverName: true,
+        driverLicense: true,
+        vehicleNumber: true,
+        offenseDate: true,
+        offenseLocation: true,
+        notes: true,
       },
     });
   }
