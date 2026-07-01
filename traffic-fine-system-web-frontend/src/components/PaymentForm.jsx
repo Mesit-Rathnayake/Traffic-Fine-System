@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './PaymentForm.css'
 import { getFineByReference, payFine } from '../services/trafficFineApi'
 
@@ -22,6 +22,17 @@ export default function PaymentForm({ isAuthenticated = false }) {
   const [message, setMessage] = useState({ type: '', text: '' })
   const [fineRecord, setFineRecord] = useState(null)
   const [lookupLoading, setLookupLoading] = useState(false)
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      return
+    }
+
+    setFormData(INITIAL_FORM_DATA)
+    setMessage({ type: '', text: '' })
+    setFineRecord(null)
+    setLookupLoading(false)
+  }, [isAuthenticated])
 
   const fineDetailRows = fineRecord
     ? [
