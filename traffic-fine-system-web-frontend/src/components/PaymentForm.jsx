@@ -269,7 +269,7 @@ export default function PaymentForm({ isAuthenticated = false }) {
                   {lookupLoading ? 'Loading...' : 'Load fine details'}
                 </button>
               </div>
-              {fineRecord ? (
+              {/* {fineRecord ? (
                 <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
                   <p className="font-semibold text-slate-900">Fine details loaded</p>
                   <div className="mt-3 grid gap-2 md:grid-cols-2">
@@ -280,6 +280,57 @@ export default function PaymentForm({ isAuthenticated = false }) {
                       </div>
                     ))}
                   </div>
+                </div>
+              ) : null} */}
+              {fineRecord ? (
+                <div className="mt-4 rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+
+                  {/* HEADER STRIP */}
+                  <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.2em] text-slate-500">
+                        Fine Details Loaded
+                      </p>
+                      <p className="text-sm font-semibold text-slate-900">
+                        Reference: {fineRecord.referenceNumber}
+                      </p>
+                    </div>
+
+                    {/* STATUS BADGE */}
+                    <div
+                      className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${
+                        fineRecord.status === 'PAID'
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-amber-100 text-amber-700'
+                      }`}
+                    >
+                      {fineRecord.status}
+                    </div>
+                  </div>
+
+                  {/* BODY GRID */}
+                  <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {fineDetailRows.map(item => (
+                      <div
+                        key={item.label}
+                        className="flex flex-col gap-1 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 hover:bg-slate-100 transition"
+                      >
+                        <p className="text-[11px] uppercase tracking-[0.18em] text-slate-500">
+                          {item.label}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-900 break-words">
+                          {item.value || 'N/A'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* FOOTER INFO STRIP */}
+                  <div className="px-5 py-3 bg-slate-50 border-t text-xs text-slate-500 flex justify-between">
+                    <span>System verified record</span>
+                    <span>Traffic Fine Portal</span>
+                  </div>
+
                 </div>
               ) : null}
             </div>

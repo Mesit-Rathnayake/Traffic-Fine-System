@@ -634,9 +634,9 @@ function App() {
             </div>
           </section>
 
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1.05fr]">
+          <div className="flex flex-col items-center gap-6">
             {/* Left Column */}
-            <div className="space-y-6">
+            <div className="w-full max-w-2xl space-y-6">
               <AuthPanel
                 authUser={authUser}
                 onAuthChange={handleAuthChange}
@@ -645,7 +645,7 @@ function App() {
             </div>
 
             {/* Right Column */}
-            <div className="space-y-6">
+            <div className="w-full max-w-2xl space-y-6">
               {activePortal === 'payment' ? (
                 <PaymentForm isAuthenticated={Boolean(authUser)} />
               ) : null}
